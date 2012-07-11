@@ -1,10 +1,10 @@
 ADCOLONY PREMIUM MOBILE VIDEO ADVERTISING NETWORK
 --------------------------------------------------
-Modified: April 6, 2012
-SDK Version: 1.9.9
+Modified: July 11, 2012
+SDK Version: 1.9.11
 
 
-AdColony 1.9.9 SDK Package Contents:
+AdColony 1.9.11 SDK Package Contents:
 ---------------------------------------
 1. AdColonyLibrary (iOS)
 	a. AdColonyPublic.h
@@ -23,11 +23,15 @@ Getting Started with AdColony:
 First time and returning users should review the AdColony SDK Quick Start Guide, as the AdColony API has been changed (Please refer to the change log for details). 
 This file is available as a PDF in the "Documentation" folder and contains everything you need to start integrating AdColony into your app quickly.   
 
-
-1.9.9 Summary Change Log:
+1.9.11 Summary Change Log:
 ----------------------------------
 Details can also be found in the AdColonyQuickStartGuide.pdf under "Changes"
 
+-AdColony reintroduced the use of Apple's unique device identifier (UDID), but continues to support Mac Address and OpenUDID.  In addition to these option, ODIN1 has been added as a fourth identifying option.
+-One method, getODIN1 has been added to the AdColony class to access the device's ODIN1 identifier.
+
+1.9.9 Summary Change Log:
+----------------------------------
 -AdColony now additionally provides the device's OpenUDID for device identification. This will affect applications that use AdColony's V4VC system in a server-based configuration. If affected, please review the Quick Start Guide.
 -One method,  getOpenUDID has been added to the AdColony class to access the device's OpenUDID.
 
