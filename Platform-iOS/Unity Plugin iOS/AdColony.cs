@@ -33,6 +33,7 @@
 //        IsV4VCAvailable( [zone_id] ):bool
 //        GetDeviceID():string
 //        GetOpenUDID():string
+//		  GetODIN1():string (only supported by iOS)
 //        GetV4VCAmount( [zone_id] ):int
 //        GetV4VCName( [zone_id] ):string
 //        ShowVideoAd( [zone_id] ):bool
@@ -167,6 +168,7 @@ public class AdColony : MonoBehaviour
   static public bool   IsV4VCAvailable( string zone_id ) { return false; }
   static public string GetDeviceID() { return "undefined"; }
   static public string GetOpenUDID() { return "undefined"; }
+  static public string GetODIN1() { return "undefined"; }
   static public int    GetV4VCAmount() { return 0; }
   static public int    GetV4VCAmount( string zone_id ) { return 0; }
   static public string GetV4VCName() { return "undefined"; }
@@ -243,7 +245,13 @@ public class AdColony : MonoBehaviour
     if ( !configured ) return "undefined";
     return IOSGetOpenUDID();
   }
-
+	
+  static public string GetODIN1()
+  {
+    if ( !configured ) return "undefined";
+    return IOSGetODIN1();
+  }
+	
   static public int GetV4VCAmount()
   {
     if ( !configured ) return 0;
@@ -366,6 +374,12 @@ public class AdColony : MonoBehaviour
   {
     if ( !configured ) return "undefined";
     return AndroidGetOpenUDID();
+  }
+	
+  static public string GetODIN1()
+  {
+	// Not supported by AndroidSDK yet
+	return "undefined";
   }
 
   static public int GetV4VCAmount()
@@ -507,6 +521,8 @@ public class AdColony : MonoBehaviour
   extern static private string IOSGetOpenUDID();
   [DllImport ("__Internal")]
   extern static private string IOSGetDeviceID();
+  [DllImport ("__Internal")]
+  extern static private string IOSGetODIN1();
   [DllImport ("__Internal")]
   extern static private int IOSGetV4VCAmount( string zone_id );
   [DllImport ("__Internal")]
