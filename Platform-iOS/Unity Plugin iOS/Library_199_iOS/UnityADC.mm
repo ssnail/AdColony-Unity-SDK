@@ -173,6 +173,25 @@ char* IOSGetOpenUDID()
     return result;
   }
 }
+    
+char* IOSGetODIN1()
+{
+    NSString* result_str = [AdColony getODIN1];
+    if (result_str)
+    {
+        const char *c_str = [result_str UTF8String];
+        int count = strlen( c_str );
+        char* result = (char *)malloc(count + 1);
+        strcpy( result, c_str );
+        return result;
+    }
+    else
+    {
+        char* result = new char[10];
+        strcpy( result, "undefined" );
+        return result;
+    }
+}
 
 int   IOSGetV4VCAmount( const char* zone_id )
 {
