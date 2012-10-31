@@ -1,16 +1,16 @@
 ADCOLONY PREMIUM MOBILE VIDEO ADVERTISING NETWORK
 --------------------------------------------------
-Modified: July 11, 2012
+Modified: October 23, 2012
 SDK Version: 1.9.11
 
 
-AdColony 1.9.11 SDK Package Contents:
+AdColony iOS 1.9.11 SDK Package Contents:
 ---------------------------------------
 1. AdColonyLibrary (iOS)
 	a. AdColonyPublic.h
 	b. libAdColony.a
 2. Documentation
-	a. AdColonySDKQuickStartGuide.pdf
+	a. AdColony Quick Start - Unity iOS.pdf
 	b. W-9 Form.pdf
 3. Sample Apps
 	a. AdColonyAdvancedApp
@@ -21,11 +21,11 @@ AdColony 1.9.11 SDK Package Contents:
 Getting Started with AdColony:
 ----------------------------------
 First time and returning users should review the AdColony SDK Quick Start Guide, as the AdColony API has been changed (Please refer to the change log for details). 
-This file is available as a PDF in the "Documentation" folder and contains everything you need to start integrating AdColony into your app quickly.   
+This file is available as a PDF in the "Documentation" folder and contains everything you need to start integrating AdColony into your app quickly.  
 
 1.9.11 Summary Change Log:
 ----------------------------------
-Details can also be found in the AdColonyQuickStartGuide.pdf under "Changes"
+Details can also be found in the AdColony Quick Start - Unity iOS.pdf under "Changes"
 
 -AdColony reintroduced the use of Apple's unique device identifier (UDID), but continues to support Mac Address and OpenUDID.  In addition to these option, ODIN1 has been added as a fourth identifying option.
 -One method, getODIN1 has been added to the AdColony class to access the device's ODIN1 identifier.
@@ -70,7 +70,7 @@ Details can also be found in the AdColonyQuickStartGuide.pdf under "Changes"
 
 Example Applications:
 ----------------------------------
-Included are three sample apps to use as examples and for help on AdColony integration. The basic app allows users to launch an ad from either of two zones. The advanced app demonstrates advanced topics such as immediate ad launch (prestitial) and includes a basic debug logger.  The currency app demonstrates how to implement videos-for-virtual currency (V4VC) to enable users to watch videos in return for in-app virtual currency rewards (includes an example currency tracker).
+Included is a sample Unity application that show a complete AdColony integration. The app allows users to launch an ad from either of two zones. The also app demonstrates how to implement videos-for-virtual currency (V4VC) to enable users to watch videos in return for in-app virtual currency rewards (includes an example currency tracker).
 
 
 Legal Requirements:
