@@ -531,8 +531,9 @@ public class AdColony : MonoBehaviour
   //---------------------------------------------------------------------------
 #if UNITY_ANDROID
   static AndroidJavaClass class_UnityPlayer;
-  static IntPtr class_UnityADC = IntPtr.Zero;
-  static IntPtr method_resume = IntPtr.Zero;
+  static IntPtr class_UnityADC	= IntPtr.Zero;
+  static IntPtr method_resume 	= IntPtr.Zero;
+  static IntPtr method_pause 	= IntPtr.Zero;
   static IntPtr method_isVideoAvailable = IntPtr.Zero;
   static IntPtr method_isV4VCAvailable  = IntPtr.Zero;
   static IntPtr method_getDeviceID      = IntPtr.Zero;
@@ -592,6 +593,8 @@ public class AdColony : MonoBehaviour
 
       // Get additional method IDs for later use.
       method_resume = AndroidJNI.GetStaticMethodID( class_UnityADC, "resume", 
+          "(Landroid/app/Activity;)V" );
+	  method_pause = AndroidJNI.GetStaticMethodID( class_UnityADC, "pause", 
           "(Landroid/app/Activity;)V" );
       method_isVideoAvailable = AndroidJNI.GetStaticMethodID( class_UnityADC, "isVideoAvailable", 
           "(Ljava/lang/String;)Z" );

@@ -1,12 +1,6 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Project/Classes/MainBasic.cs">
-    <Files>
-      <File FileName="Assets/Plugins/AdColony.cs" Line="1" Column="1" />
-      <File FileName="Assets/Project/Classes/MainBasic.cs" Line="295" Column="3" />
-      <File FileName="Assets/Project/Classes/MainSettings.cs" Line="1" Column="1" />
-    </Files>
-  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workbench />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>

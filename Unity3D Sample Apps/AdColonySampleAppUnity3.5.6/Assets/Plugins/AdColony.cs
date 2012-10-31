@@ -464,20 +464,20 @@ public class AdColony : MonoBehaviour
 
   public void OnAdColonyVideoStarted( string args )
   {
-    //if (OnVideoStarted != null) OnVideoStarted();
+    if (OnVideoStarted != null) OnVideoStarted();
 
-    //previous_timescale = Time.timeScale;
-    //Time.timeScale = 0.0f;
-    //saved_timescale = true;
+    previous_timescale = Time.timeScale;
+    Time.timeScale = 0.0f;
+    saved_timescale = true;
   }
 
   public void OnAdColonyVideoFinished( string args )
   {
-    //if (saved_timescale)
-    //{
-    //  saved_timescale = false;
-    //  Time.timeScale = previous_timescale;
-    //}
+    if (saved_timescale)
+    {
+      saved_timescale = false;
+      Time.timeScale = previous_timescale;
+    }
 
     if (OnVideoFinished != null) OnVideoFinished();
   }
