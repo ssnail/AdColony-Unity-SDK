@@ -38,6 +38,13 @@ NSString*     adc_cur_zone = nil;
 NSMutableDictionary* adc_zone_ids = nil;
 UnityADCIOSDelegate* adc_ios_delegate = nil;
 
+NSString* set_adc_cur_zone( NSString* new_adc_cur_zone )
+{
+  if (adc_cur_zone) [adc_cur_zone release];
+  adc_cur_zone = [new_adc_cur_zone retain];
+  return adc_cur_zone;
+}
+
 
 @implementation UnityADCIOSDelegate
 - (NSString *) adColonyApplicationID
@@ -107,7 +114,7 @@ extern "C"
         {
             NSString* zone_id_str = [NSString stringWithUTF8String:zone_ids[i]];
             [adc_zone_ids setObject:zone_id_str forKey:[NSNumber numberWithInt:i+1]];
-            if (i == 0) adc_cur_zone = [zone_id_str retain];
+            if (i == 0) set_adc_cur_zone( zone_id_str );
         }
 
         adc_ios_delegate = [[[UnityADCIOSDelegate alloc] init] retain];
@@ -119,8 +126,7 @@ extern "C"
         NSString* zid = adc_cur_zone;
         if (zone_id && zone_id[0] != 0)
         {
-            adc_cur_zone = [NSString stringWithUTF8String:zone_id];
-            zid = adc_cur_zone;
+            zid = set_adc_cur_zone( [NSString stringWithUTF8String:zone_id] );
         }
         return [AdColonyAdministratorPublic didVideoFinishLoadingForZone:zid];
     }
@@ -130,8 +136,7 @@ extern "C"
         NSString* zid = adc_cur_zone;
         if (zone_id && zone_id[0] != 0)
         {
-            adc_cur_zone = [NSString stringWithUTF8String:zone_id];
-            zid = adc_cur_zone;
+            zid = set_adc_cur_zone( [NSString stringWithUTF8String:zone_id] );
         }
         if ( !IOSIsVideoAvailable(zone_id) ) return false;
         return [AdColonyAdministratorPublic virtualCurrencyAwardAvailableForZone:zid];
@@ -199,8 +204,7 @@ extern "C"
         NSString* zid = adc_cur_zone;
         if (zone_id && zone_id[0] != 0)
         {
-            adc_cur_zone = [NSString stringWithUTF8String:zone_id];
-            zid = adc_cur_zone;
+            zid = set_adc_cur_zone( [NSString stringWithUTF8String:zone_id] );
         }
         return [AdColonyAdministratorPublic getVirtualCurrencyRewardAmountForZone:zid];
     }
@@ -210,8 +214,7 @@ extern "C"
         NSString* zid = adc_cur_zone;
         if (zone_id && zone_id[0] != 0)
         {
-            adc_cur_zone = [NSString stringWithUTF8String:zone_id];
-            zid = adc_cur_zone;
+            zid = set_adc_cur_zone( [NSString stringWithUTF8String:zone_id] );
         }
         NSString* result_str = [AdColonyAdministratorPublic getVirtualCurrencyNameForZone:zid];
         if (result_str)
@@ -235,8 +238,7 @@ extern "C"
         NSString* zid = adc_cur_zone;
         if (zone_id && zone_id[0] != 0)
         {
-            adc_cur_zone = [NSString stringWithUTF8String:zone_id];
-            zid = adc_cur_zone;
+            zid = set_adc_cur_zone( [NSString stringWithUTF8String:zone_id] );
         }
         if ( !IOSIsVideoAvailable(zone_id) ) return false;
 
@@ -250,8 +252,7 @@ extern "C"
         NSString* zid = adc_cur_zone;
         if (zone_id && zone_id[0] != 0)
         {
-            adc_cur_zone = [NSString stringWithUTF8String:zone_id];
-            zid = adc_cur_zone;
+            zid = set_adc_cur_zone( [NSString stringWithUTF8String:zone_id] );
         }
         if ( !IOSIsV4VCAvailable(zone_id) ) return false;
 
@@ -265,8 +266,7 @@ extern "C"
         NSString* zid = adc_cur_zone;
         if (zone_id && zone_id[0] != 0)
         {
-            adc_cur_zone = [NSString stringWithUTF8String:zone_id];
-            zid = adc_cur_zone;
+          zid = set_adc_cur_zone( [NSString stringWithUTF8String:zone_id] );
         }
         if ( !IOSIsV4VCAvailable(zone_id) ) return;
 

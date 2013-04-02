@@ -623,6 +623,18 @@ public class AdColony : MonoBehaviour
     }
   }
 
+  static public void AndroidSuspendToHomeScreen()
+  {
+    Debug.Log("***********************call AndroidSuspendToHomeScreen");
+    AndroidJavaClass class_UnityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+    AndroidJavaObject activity = class_UnityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+
+    AndroidJavaObject intent = new AndroidJavaObject("android.content.Intent", "android.intent.action.MAIN");
+    intent.Call<AndroidJavaObject>("addCategory", "android.intent.category.HOME");
+
+    activity.Call("startActivity", intent);
+  }
+
   static void AndroidResume()
   {
     var j_activity = class_UnityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
