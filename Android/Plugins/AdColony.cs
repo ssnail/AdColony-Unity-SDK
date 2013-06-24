@@ -194,6 +194,15 @@ public class AdColony : MonoBehaviour
   {
     if (configured) return;
 
+    if (app_version.Contains("version:"))
+    {
+      string[] delims = new string[] {"version:", ","};
+      string[] app_version_split = app_version.Split(delims, StringSplitOptions.RemoveEmptyEntries);
+      app_version = app_version_split[0];
+    }
+
+    // Debug.Log("**************************************************" + app_version);
+
 #if UNITY_EDITOR
     Debug.LogWarning( "Note: AdColony doesn't play videos in the editor." );
     configured = false;
