@@ -14,17 +14,17 @@ Contains:
 ----------------------------------
 * Android
   * Plugins
-    * AdColony.cs
+    * `AdColony.cs`
     * Android 
-      * adcolony.jar
-      * AndroidManifest.xml
-      * unityadc.jar
+      * `adcolony.jar`
+      * `AndroidManifest.xml`
+      * `unityadc.jar`
 * iOS
   * Plugins 
-    * AdColony.cs
+    * `AdColony.cs`
     * iOS
-      * AdColony.framework
-      * UnityADC.mm
+      * `AdColony.framework`
+      * `UnityADC.mm`
 * Sample Apps
   * AdColony Sample App - Unity 3.5.6
 * W-9 Form.pdf
