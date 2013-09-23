@@ -12,26 +12,45 @@ The simplest way to obtain the AdColony Unity plugin is to click the "Download Z
 
 Contains:
 ----------------------------------
-* Android
-  * Plugins
-    * `AdColony.cs`  
-    * Android 
-      * `adcolony.jar`
-      * `AndroidManifest.xml`
-      * `unityadc.jar`
-* iOS
-  * Editor 
-    * `mod_pbxproj.pyc`  
-    * `PostprocessBuildPlayer`  
-    * `PostprocessBuildPlayer_ADC`  
-  * Plugins 
-    * `AdColony.cs`  
-    * iOS
-      * `AdColony.framework`
-      * `UnityADC.mm`
-* Sample Apps
-  * AdColony Sample App - Unity 3.5.6
-* W-9 Form.pdf
+<ul>
+<li>Android<ul>
+<li>Plugins<ul>
+<li><code>AdColony.cs</code></li>
+<li>Android 
+<ul>
+<li><code>adcolony.jar</code></li>
+<li><code>AndroidManifest.xml</code></li>
+<li><code>unityadc.jar</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>iOS<ul>
+<li>Editor <ul>
+<li><code>mod_pbxproj.pyc</code>  </li>
+<li><code>PostprocessBuildPlayer</code>  </li>
+<li><code>PostprocessBuildPlayer_ADC</code>  </li>
+</ul>
+</li>
+<li>Plugins <ul>
+<li><code>AdColony.cs</code>  </li>
+<li>iOS<ul>
+<li><code>AdColony.framework</code></li>
+<li><code>UnityADC.mm</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Sample Apps<ul>
+<li>AdColony Sample App - Unity 3.5.6</li>
+</ul>
+</li>
+<li>W-9 Form.pdf</li>
+</ul>
 
 Getting Started with AdColony:
 ----------------------------------
