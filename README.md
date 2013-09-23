@@ -16,8 +16,7 @@ Contains:
 <li>Android<ul>
 <li>Plugins<ul>
 <li><code>AdColony.cs</code></li>
-<li>Android 
-<ul>
+<li>Android<ul>
 <li><code>adcolony.jar</code></li>
 <li><code>AndroidManifest.xml</code></li>
 <li><code>unityadc.jar</code></li>
@@ -28,14 +27,14 @@ Contains:
 </ul>
 </li>
 <li>iOS<ul>
-<li>Editor <ul>
-<li><code>mod_pbxproj.pyc</code>  </li>
-<li><code>PostprocessBuildPlayer</code>  </li>
-<li><code>PostprocessBuildPlayer_ADC</code>  </li>
+<li>Editor<ul>
+<li><code>mod_pbxproj.pyc</code></li>
+<li><code>PostprocessBuildPlayer</code></li>
+<li><code>PostprocessBuildPlayer_ADC</code></li>
 </ul>
 </li>
-<li>Plugins <ul>
-<li><code>AdColony.cs</code>  </li>
+<li>Plugins<ul>
+<li><code>AdColony.cs</code></li>
 <li>iOS<ul>
 <li><code>AdColony.framework</code></li>
 <li><code>UnityADC.mm</code></li>
