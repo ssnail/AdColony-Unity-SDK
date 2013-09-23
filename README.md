@@ -78,6 +78,27 @@ Legal Requirements:
 ----------------------------------
 You must accept the terms and conditions on the AdColony website by registering in order to legally use the AdColony SDK. U.S. based companies will need to complete the W-9 form and send it to us, as well as complete the section on payment information on clients.adcolony.com, before publisher payments can be issued.
 
+* Android
+    * Plugins
+        * `AdColony.cs`  
+        * Android 
+            * `adcolony.jar`
+            * `AndroidManifest.xml`
+            * `unityadc.jar`
+* iOS
+    * Editor 
+        * `mod_pbxproj.pyc`  
+        * `PostprocessBuildPlayer`  
+        * `PostprocessBuildPlayer_ADC`  
+    * Plugins 
+        * `AdColony.cs`  
+        * iOS
+            * `AdColony.framework`
+            * `UnityADC.mm`
+* Sample Apps
+    * AdColony Sample App - Unity 3.5.6
+* W-9 Form.pdf
+
 
 Contact Us:
 ----------------------------------
