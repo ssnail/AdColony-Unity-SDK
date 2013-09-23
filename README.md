@@ -13,7 +13,7 @@ The simplest way to obtain the AdColony Unity plugin is to click the "Download Z
 Contains:
 ----------------------------------
 <ul>
-<li>Android
+<li>**Android**
   <ul>
     <li>Plugins
       <ul>
@@ -29,7 +29,7 @@ Contains:
     </li>
   </ul>
 </li>
-<li>iOS
+<li>**iOS**
   <ul>
     <li>Editor
       <ul>
@@ -51,7 +51,7 @@ Contains:
     </li>
   </ul>
 </li>
-<li>Sample Apps
+<li>**Sample Apps**
   <ul>
     <li>AdColony Sample App - Unity 3.5.6</li>
   </ul>
