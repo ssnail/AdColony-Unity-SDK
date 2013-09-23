@@ -20,6 +20,10 @@ Contains:
       * `AndroidManifest.xml`
       * `unityadc.jar`
 * iOS
+  * Editor 
+    * `mod_pbxproj.pyc`
+    * `PostprocessBuildPlayer`
+    * `PostprocessBuildPlayer_ADC`
   * Plugins 
     * `AdColony.cs`
     * iOS
