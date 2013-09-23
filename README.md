@@ -14,18 +14,18 @@ Contains:
 ----------------------------------
 * Android
   * Plugins
-    * `AdColony.cs`
+    * `AdColony.cs`  
     * Android 
       * `adcolony.jar`
       * `AndroidManifest.xml`
       * `unityadc.jar`
 * iOS
   * Editor 
-    * `mod_pbxproj.pyc`
-    * `PostprocessBuildPlayer`
-    * `PostprocessBuildPlayer_ADC`
+    * `mod_pbxproj.pyc`  
+    * `PostprocessBuildPlayer`  
+    * `PostprocessBuildPlayer_ADC`  
   * Plugins 
-    * `AdColony.cs`
+    * `AdColony.cs`  
     * iOS
       * `AdColony.framework`
       * `UnityADC.mm`
