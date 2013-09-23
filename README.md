@@ -56,7 +56,7 @@ Contains:
     <li>AdColony Sample App - Unity 3.5.6</li>
   </ul>
 </li>
-<li>W-9 Form.pdf</li>
+  <li>W-9 Form.pdf</li>
 </ul>
 
 Getting Started with AdColony:
