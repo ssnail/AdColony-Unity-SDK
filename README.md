@@ -6,9 +6,7 @@ Android SDK Version: 2.0.3
 
 To Download:
 ----------------------------------
-**NOTE:** A new version is coming soon. Please contact support@adcolony.com if you need the Unity SDK as soon as possible.
-
-The simplest way to obtain the AdColony Unity plugin is to click the "Download ZIP" button located in the right-hand navigation pane of this page. 
+The simplest way to obtain the AdColony Unity plugin is to click the `Download ZIP` button located in the right-hand navigation pane of this page. 
 
 Contains:
 ----------------------------------
