@@ -42,6 +42,7 @@
 //        ShowVideoAd( [zone_id] ):bool
 //        ShowV4VC( popup_result:bool, [zone_id] ):bool
 //        OfferV4VC( popup_result:bool, [zone_id] )
+//        StatusForZone( zone_id:string ):string
 //
 //      NOTES
 //      - The only method many apps will need is "ShowVideoAd()".  For example,
@@ -71,6 +72,7 @@
 //             AdColony.OnVideoStarted = OnVideoStarted;
 //             AdColony.OnVideoFinished = OnVideoFinished;
 //             AdColony.OnV4VCResult = OnV4VCResult;
+//             AdColony.OnAdAvailabilityChange = OnAdAvailabilityChange;
 //             AdColony.ShowVideoAd();
 //          }
 //
@@ -79,7 +81,7 @@
 //            Debug.Log( "Ad playing." );
 //          }
 //
-//          void OnVideoFinished()
+//          void OnVideoFinished( boolean ad_shown )
 //          {
 //            Debug.Log( "Ad finished." );
 //          }
@@ -148,13 +150,15 @@ public class AdColony : MonoBehaviour
   // delegates as described in Step 4 of the "GENERAL SETUP" instructions
   // above.
   public delegate void VideoStartedDelegate();
-  public delegate void VideoFinishedDelegate();
+  public delegate void VideoFinishedDelegate( bool ad_shown );
   public delegate void V4VCResultDelegate( bool success, string name, int amount );
+  public delegate void AdAvailabilityChangeDelegate( bool available, string zone_id );
 
   // DELEGATE PROPERTIES
-  public static VideoStartedDelegate  OnVideoStarted;  // only called for iOS
-  public static VideoFinishedDelegate OnVideoFinished;
-  public static V4VCResultDelegate    OnV4VCResult;
+  public static VideoStartedDelegate         OnVideoStarted;
+  public static VideoFinishedDelegate        OnVideoFinished;
+  public static V4VCResultDelegate           OnV4VCResult;
+  public static AdAvailabilityChangeDelegate OnAdAvailabilityChange;
 
   //---------------------------------------------------------------------------
   //  PUBLIC INTERFACE - NON-IOS/NON-ANDROID (stub functionality)
@@ -188,6 +192,7 @@ public class AdColony : MonoBehaviour
   static public bool   ShowV4VC( bool popup_result, string zone_id ) { return false; }
   static public void   OfferV4VC( bool popup_result ) { }
   static public void   OfferV4VC( bool popup_result, string zone_id ) { }
+  static public string StatusForZone( string zone_id ) { }
   // static public int    GetAvailableViews( string zone_id ) { return 0; }
 #endif
 
@@ -331,6 +336,11 @@ public class AdColony : MonoBehaviour
     IOSOfferV4VC( popup_result, zone_id );
   }
 
+  static public string StatusForZone( string zone_id ) {
+    if ( !configured ) return "";
+    return IOSStatusForZone( zone_id );
+  }
+
   // static public int GetAvailableViews( string zone_id )
   // {
   //   if ( !configured ) return -1;
@@ -467,6 +477,12 @@ public class AdColony : MonoBehaviour
     AndroidOfferV4VC( popup_result, zone_id );
   }
 
+  static public string StatusForZone( string zone_id )
+  {
+    if ( !configured ) return "";
+    return AndroidStatusForZone( zone_id );
+  }
+
   static public int GetAvailableViews( string zone_id )
   {
     if ( !configured ) return -1;
@@ -526,7 +542,10 @@ public class AdColony : MonoBehaviour
 //      Time.timeScale = previous_timescale;
 //    }
 
-    if (OnVideoFinished != null) OnVideoFinished();
+    if (OnVideoFinished == null) return;
+    string ad_shown = args;
+
+    OnVideoFinished( ad_shown.Equals("true") );
   }
 
   public void OnAdColonyV4VCResult( string args )
@@ -539,6 +558,17 @@ public class AdColony : MonoBehaviour
       string amount_str = args.Substring( i1+1, (i2-i1)-1 );
       string name_str = args.Substring( i2+1 );
       OnV4VCResult( success_str.Equals("true"), name_str, int.Parse(amount_str) );
+    }
+  }
+
+  public void OnAdColonyAdAvailabilityChange( string args )
+  {
+    if (OnAdAvailabilityChange != null)
+    {
+      int i1 = args.IndexOf( "|" );
+      string available_str = args.Substring( 0, i1 );
+      string zone_str = args.Substring( i1+1 );
+      OnAdAvailabilityChange( available_str.Equals("true"), zone_str );
     }
   }
 
@@ -573,6 +603,8 @@ public class AdColony : MonoBehaviour
   extern static private bool IOSShowV4VC( bool popup_result, string zone_id );
   [DllImport ("__Internal")]
   extern static private void IOSOfferV4VC( bool popup_result, string zone_id );
+  [DllImport ("__Internal")]
+  extern static private string IOSStatusForZone( string zone_id );
 
 #endif // UNITY_IPHONE
 
@@ -581,25 +613,28 @@ public class AdColony : MonoBehaviour
   //  ANDROID NATIVE INTERFACE
   //---------------------------------------------------------------------------
 #if UNITY_ANDROID
+  static bool adr_initialized = false;
   static AndroidJavaClass class_UnityPlayer;
-  static IntPtr class_UnityADC = IntPtr.Zero;
-  static IntPtr method_pause   = IntPtr.Zero;
-  static IntPtr method_resume  = IntPtr.Zero;
-  static IntPtr method_setCustomID = IntPtr.Zero;
-  static IntPtr method_getCustomID = IntPtr.Zero;
-  static IntPtr method_isVideoAvailable = IntPtr.Zero;
-  static IntPtr method_isV4VCAvailable  = IntPtr.Zero;
-  static IntPtr method_getDeviceID      = IntPtr.Zero;
-  static IntPtr method_getV4VCAmount    = IntPtr.Zero;
-  static IntPtr method_getV4VCName      = IntPtr.Zero;
-  static IntPtr method_showVideo = IntPtr.Zero;
-  static IntPtr method_showV4VC  = IntPtr.Zero;
-  static IntPtr method_offerV4VC = IntPtr.Zero;
+  static IntPtr class_UnityADC           = IntPtr.Zero;
+  static IntPtr method_configure         = IntPtr.Zero;
+  static IntPtr method_pause             = IntPtr.Zero;
+  static IntPtr method_resume            = IntPtr.Zero;
+  static IntPtr method_setCustomID       = IntPtr.Zero;
+  static IntPtr method_getCustomID       = IntPtr.Zero;
+  static IntPtr method_isVideoAvailable  = IntPtr.Zero;
+  static IntPtr method_isV4VCAvailable   = IntPtr.Zero;
+  static IntPtr method_getDeviceID       = IntPtr.Zero;
+  static IntPtr method_getV4VCAmount     = IntPtr.Zero;
+  static IntPtr method_getV4VCName       = IntPtr.Zero;
+  static IntPtr method_showVideo         = IntPtr.Zero;
+  static IntPtr method_showV4VC          = IntPtr.Zero;
+  static IntPtr method_offerV4VC         = IntPtr.Zero;
+  static IntPtr method_statusForZone     = IntPtr.Zero;
   static IntPtr method_getAvailableViews = IntPtr.Zero;
 
-  static void AndroidConfigure( string app_version, string app_id, string[] zone_ids )
+  static void AndroidInitializePlugin()
   {
-    bool success = true;
+   bool success = true;
     IntPtr local_class_UnityADC = AndroidJNI.FindClass("com/jirbo/unityadc/UnityADC");
     if (local_class_UnityADC != IntPtr.Zero)
     {
@@ -622,28 +657,12 @@ public class AdColony : MonoBehaviour
 
     if (success)
     {
-      // Prepare call arguments.
+
       class_UnityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-
-      var j_activity = class_UnityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
-      var j_app_version = AndroidJNI.NewStringUTF( app_version );
-      var j_app_id = AndroidJNI.NewStringUTF( app_id );
-      var j_strings = AndroidJNIHelper.ConvertToJNIArray( zone_ids );
-
-
-      // Call UnityADC.configure( version, app_version, app_id, ids )
-      var method_configure = AndroidJNI.GetStaticMethodID( class_UnityADC, "configure",
+      // Get additional method IDs for later use.
+      method_configure = AndroidJNI.GetStaticMethodID( class_UnityADC, "configure",
           "(Landroid/app/Activity;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;)V" );
 
-      jvalue[] args = new jvalue[4];
-      args[0].l = j_activity.GetRawObject();
-      args[1].l = j_app_version;
-      args[2].l = j_app_id;
-      args[3].l = j_strings;
-
-      AndroidJNI.CallStaticVoidMethod( class_UnityADC, method_configure, args );
-
-      // Get additional method IDs for later use.
       method_pause = AndroidJNI.GetStaticMethodID( class_UnityADC, "pause",
           "(Landroid/app/Activity;)V" );
       method_resume = AndroidJNI.GetStaticMethodID( class_UnityADC, "resume",
@@ -668,10 +687,12 @@ public class AdColony : MonoBehaviour
           "(ZLjava/lang/String;)Z" );
       method_offerV4VC = AndroidJNI.GetStaticMethodID( class_UnityADC, "offerV4VC",
           "(ZLjava/lang/String;)V" );
+      method_statusForZone = AndroidJNI.GetStaticMethodID( class_UnityADC, "statusForZone",
+          "(Ljava/lang/String;)Ljava/lang/String;" );
       method_getAvailableViews = AndroidJNI.GetStaticMethodID( class_UnityADC, "getAvailableViews",
           "(Ljava/lang/String;)I" );
 
-      configured = true;
+      adr_initialized = true;
     }
     else
     {
@@ -679,6 +700,29 @@ public class AdColony : MonoBehaviour
       Debug.LogError( "AdColony configuration error - make sure adcolony.jar and "
           + "unityadc.jar libraries are in your Unity project's Assets/Plugins/Android folder." );
     }
+  }
+
+  static void AndroidConfigure( string app_version, string app_id, string[] zone_ids )
+  {
+    if(!adr_initialized) AndroidInitializePlugin();
+
+    // Prepare call arguments.
+    class_UnityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+
+    var j_activity = class_UnityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+    var j_app_version = AndroidJNI.NewStringUTF( app_version );
+    var j_app_id = AndroidJNI.NewStringUTF( app_id );
+    var j_strings = AndroidJNIHelper.ConvertToJNIArray( zone_ids );
+
+    // Call UnityADC.configure( version, app_version, app_id, ids )
+    jvalue[] args = new jvalue[4];
+    args[0].l = j_activity.GetRawObject();
+    args[1].l = j_app_version;
+    args[2].l = j_app_id;
+    args[3].l = j_strings;
+
+    AndroidJNI.CallStaticVoidMethod( class_UnityADC, method_configure, args );
+    configured = true;
   }
 
   static public void AndroidSuspendToHomeScreen()
@@ -713,6 +757,7 @@ public class AdColony : MonoBehaviour
 
   static void AndroidSetCustomID( string custom_id )
   {
+    if(!adr_initialized) AndroidInitializePlugin();
     jvalue[] args = new jvalue[1];
     args[0].l = AndroidJNI.NewStringUTF( custom_id );
     AndroidJNI.CallStaticStringMethod( class_UnityADC, method_setCustomID, args );
@@ -787,6 +832,13 @@ public class AdColony : MonoBehaviour
     args[0].z = popup_result;
     args[1].l = AndroidJNI.NewStringUTF( zone_id );
     AndroidJNI.CallStaticVoidMethod( class_UnityADC, method_offerV4VC, args );
+  }
+
+  static string AndroidStatusForZone( string zone_id )
+  {
+    jvalue[] args = new jvalue[1];
+    args[0].l = AndroidJNI.NewStringUTF( zone_id );
+    return AndroidJNI.CallStaticStringMethod( class_UnityADC, method_statusForZone, args );
   }
 
   static int AndroidGetAvailableViews( string zone_id )

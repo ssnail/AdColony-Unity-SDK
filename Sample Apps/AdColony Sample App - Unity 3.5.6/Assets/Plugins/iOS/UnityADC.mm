@@ -26,11 +26,11 @@ void UnityPause(bool pause);
 // AdColonyDelegate
 // - (void) onAdColonyAdAvailabilityChange:(BOOL)available inZone:(NSString *)zoneID;
 - (void) onAdColonyV4VCReward:(BOOL)success currencyName:(NSString *)currencyName currencyAmount:(int)amount inZone:(NSString *)zoneID;
+- (void) onAdColonyAdAvailabilityChange:(BOOL)available inZone:(NSString *)zoneID;
 
 // AdColonyAdDelegate
 - (void) onAdColonyAdStartedInZone:(NSString *)zoneID;
 - (void) onAdColonyAdAttemptFinished:(BOOL)shown inZone:(NSString *)zoneID;
-
 // - (void) adColonyTakeoverBeganForZone:(NSString *)zone;
 // - (void) adColonyTakeoverEndedForZone:(NSString*)zone withVC:(BOOL)vc;
 // - (void) adColonyVideoAdNotServedForZone:(NSString*)zone;
@@ -65,6 +65,13 @@ NSString* set_adc_cur_zone( NSString* new_adc_cur_zone )
                 [[NSString stringWithFormat:@"%@|%d|%@", success_str, amount, currencyName] UTF8String] );
 }
 
+- (void) onAdColonyAdAvailabilityChange:(BOOL)available inZone:(NSString *)zoneID
+{
+    NSString* available_str = available ? @"true" : @"false";
+    UnitySendMessage( "AdColony", "OnAdColonyAdAvailabilityChange",
+                [[NSString stringWithFormat:@"%@|%@", available_str, zoneID] UTF8String] );
+}
+
 // AdColonyAdDelegate
 - (void) onAdColonyAdStartedInZone:(NSString *)zoneID
 {
@@ -73,7 +80,9 @@ NSString* set_adc_cur_zone( NSString* new_adc_cur_zone )
 
 - (void) onAdColonyAdAttemptFinished:(BOOL)shown inZone:(NSString *)zoneID
 {
-    UnitySendMessage( "AdColony", "OnAdColonyVideoFinished", "" );
+    NSString* shown_str = shown ? @"true" : @"false";
+    UnitySendMessage( "AdColony", "OnAdColonyVideoFinished",
+                     [[NSString stringWithFormat:@"%@", shown_str] UTF8String] );
 }
 @end
 
@@ -242,6 +251,40 @@ extern "C"
             strcpy( result, "undefined" );
             return result;
         }
+    }
+
+    char* IOSStatusForZone( const char* zone_id)
+    {
+        NSString* zid = adc_cur_zone;
+        if (zone_id && zone_id[0] != 0)
+        {
+            zid = set_adc_cur_zone( [NSString stringWithUTF8String:zone_id] );
+        }
+
+        char* status_cstr = (char*)malloc(10);
+        strcpy(status_cstr, "");
+        // NSString* status_str;
+        ADCOLONY_ZONE_STATUS status = [AdColony zoneStatusForZone:zid];
+        switch (status)
+        {
+            case ADCOLONY_ZONE_STATUS_NO_ZONE:
+                strcpy(status_cstr, "invalid");
+                break;
+            case ADCOLONY_ZONE_STATUS_OFF:
+                strcpy(status_cstr, "off");
+                break;
+            case ADCOLONY_ZONE_STATUS_ACTIVE:
+                strcpy(status_cstr, "active");
+                break;
+            case ADCOLONY_ZONE_STATUS_LOADING:
+                strcpy(status_cstr, "loading");
+                break;
+            case ADCOLONY_ZONE_STATUS_UNKNOWN:
+                strcpy(status_cstr, "unknown");
+                break;
+        }
+
+        return status_cstr;
     }
 
     bool  IOSShowVideoAd( const char* zone_id )
