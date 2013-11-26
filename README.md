@@ -41,7 +41,7 @@ Change Log (2013/11/26):
 * iOS SDK 2.2.4 integrated
 * Android SDK 2.0.4 integrated
 * Public class methods `StatusForZone` exposed.
-* `OnVideoFinished` delegate signature no includes a boolean parameter (requires small up date to existing integrations.)
+* The `OnVideoFinished` delegate signature now includes a boolean parameter. The change requires a small update to existing integrations. For more information, consult the `Updating from Earlier Versions` section of documentation for your platform (Android or iOS).
 * `OnAdAvailabilityChange` delegate has been exposed.
 
 Change Log (2013/09/23):
