@@ -1,8 +1,8 @@
 AdColony Unity Plugin
 ==================================
 Modified: 2013/09/23  
-iOS SDK Version: 2.2.2  
-Android SDK Version: 2.0.3
+iOS SDK Version: 2.2.4  
+Android SDK Version: 2.0.4
 
 To Download:
 ----------------------------------
@@ -35,6 +35,14 @@ Contains:
 Getting Started with AdColony:
 ----------------------------------
 First time users should review the [quick start guide](https://github.com/AdColony/AdColony-Unity-SDK/wiki). Returning users should only need to update the AdColony SDK files in their projects (note, iOS developers, that the iOS SDK is now distributed as framework)
+
+Change Log (2013/11/26):
+----------------------------------
+* iOS SDK 2.2.4 integrated
+* Android SDK 2.0.4 integrated
+* Public class methods `StatusForZone` exposed.
+* `OnVideoFinished` delegate signature no includes a boolean parameter (requires small up date to existing integrations.)
+* `OnAdAvailabilityChange` delegate has been exposed.
 
 Change Log (2013/09/23):
 ----------------------------------
