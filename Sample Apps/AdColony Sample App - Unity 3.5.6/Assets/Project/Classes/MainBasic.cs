@@ -99,6 +99,7 @@ public class MainBasic : MonoBehaviour
 		AdColony.OnVideoStarted		= this.OnVideoStarted;
 		AdColony.OnVideoFinished	= this.OnVideoFinished;
 		AdColony.OnV4VCResult		= this.OnV4VCResult;
+		AdColony.OnAdAvailabilityChange = this.OnAdAvailabilityChange;
 
 		// Replace these values with data for your own app and zones
 		// The values are in the Main object in the Hierarchy of the ACUBasic scene
@@ -184,6 +185,7 @@ public class MainBasic : MonoBehaviour
 
 		if(GUI.Button(this.videoRect1, this.videoText1))
 		{
+			Debug.Log("Status for zone: " + AdColony.StatusForZone( this.zoneId1 ));
 			if(AdColony.IsVideoAvailable(this.zoneId1))
 			{
 				Debug.Log("Play AdColony Video1");
@@ -292,9 +294,9 @@ public class MainBasic : MonoBehaviour
 		this.Pause();
 	}
 
-	private void OnVideoFinished()
+	private void OnVideoFinished( bool ad_was_shown )
 	{
-		Debug.Log("On Video Finished");
+		Debug.Log("On Video Finished, and Ad was shown: " + ad_was_shown);
 
 		this.Resume();
 	}
@@ -314,6 +316,11 @@ public class MainBasic : MonoBehaviour
 		{
 			Debug.LogWarning("V4VC FAILED!");
 		}
+	}
+
+	private void OnAdAvailabilityChange( bool avail, string zone_id)
+	{
+		Debug.Log("Ad Availability Changed to available=" + avail + " In zone: "+ zone_id);
 	}
 
 	private void findAudio()
