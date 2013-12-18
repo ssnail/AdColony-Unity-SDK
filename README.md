@@ -1,8 +1,8 @@
 AdColony Unity Plugin
 ==================================
-Modified: 2013/09/23  
-iOS SDK Version: 2.2.2  
-Android SDK Version: 2.0.3
+Modified: 2013/11/26  
+iOS SDK Version: 2.2.4  
+Android SDK Version: 2.0.4
 
 To Download:
 ----------------------------------
@@ -34,7 +34,15 @@ Contains:
 
 Getting Started with AdColony:
 ----------------------------------
-First time users should review the [quick start guide](https://github.com/AdColony/AdColony-Unity-SDK/wiki). Returning users should only need to update the AdColony SDK files in their projects (note, iOS developers, that the iOS SDK is now distributed as framework)
+First time users should review the [quick start guide](https://github.com/AdColony/AdColony-Unity-SDK/wiki). Returning users should only need to update the AdColony SDK files in their projects (note, iOS developers, that the iOS SDK is now distributed as framework). Also with this release comes an update to the `OnVideoFinished` delegate signature, which now includes a boolean parameter. For returning users this change requires a small update to existing integrations. For more information, consult the `Updating from Earlier Versions` section of the Unity SDK documentation for your platform (Android or iOS).
+
+Change Log (2013/11/26):
+----------------------------------
+* iOS SDK 2.2.4 integrated
+* Android SDK 2.0.4 integrated
+* Public class methods `StatusForZone` exposed.
+* The `OnVideoFinished` delegate signature now includes a boolean parameter. The change requires a small update to existing integrations. For more information, consult the `Updating from Earlier Versions` section of the Unity SDK documentation for your platform (Android or iOS).
+* `OnAdAvailabilityChange` delegate has been exposed.
 
 Change Log (2013/09/23):
 ----------------------------------
