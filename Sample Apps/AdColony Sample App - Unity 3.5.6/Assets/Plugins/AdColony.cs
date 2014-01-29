@@ -192,7 +192,7 @@ public class AdColony : MonoBehaviour
   static public bool   ShowV4VC( bool popup_result, string zone_id ) { return false; }
   static public void   OfferV4VC( bool popup_result ) { }
   static public void   OfferV4VC( bool popup_result, string zone_id ) { }
-  static public string StatusForZone( string zone_id ) { }
+  static public string StatusForZone( string zone_id ) { return "undefined"; }
   // static public int    GetAvailableViews( string zone_id ) { return 0; }
 #endif
 
