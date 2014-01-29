@@ -1,8 +1,8 @@
 AdColony Unity Plugin
 ==================================
-Modified: 2013/11/26  
+Modified: 2014/01/25  
 iOS SDK Version: 2.2.4  
-Android SDK Version: 2.0.4
+Android SDK Version: 2.0.6
 
 To Download:
 ----------------------------------
@@ -15,7 +15,8 @@ Contains:
         * `AdColony.cs`  
         * Android 
             * `adcolony.jar`
-            * `AndroidManifest.xml`
+            * `AndroidManifest.xml` (use for Unity < 4.3)
+            * `AndroidManifest_Unity43.xml` (use for Unity 4.3 and above. Rename this to `AndroidManifest.xml`)
             * `unityadc.jar`
 * iOS
     * Editor 
@@ -35,6 +36,11 @@ Contains:
 Getting Started with AdColony:
 ----------------------------------
 First time users should review the [quick start guide](https://github.com/AdColony/AdColony-Unity-SDK/wiki). Returning users should only need to update the AdColony SDK files in their projects (note, iOS developers, that the iOS SDK is now distributed as framework). Also with this release comes an update to the `OnVideoFinished` delegate signature, which now includes a boolean parameter. For returning users this change requires a small update to existing integrations. For more information, consult the `Updating from Earlier Versions` section of the Unity SDK documentation for your platform (Android or iOS).
+
+Change Log (2014/01/25):
+----------------------------------
+* Android SDK 2.0.6 integrated
+* Added `AndroidManifest_Unity43.xml` -- You must use this manifest if you are building with Unity 4.3.x, no change is necessary if you are using Unity 4.2.x and below.
 
 Change Log (2013/11/26):
 ----------------------------------
