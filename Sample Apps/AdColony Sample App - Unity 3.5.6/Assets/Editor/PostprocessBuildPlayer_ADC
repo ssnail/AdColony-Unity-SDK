@@ -37,6 +37,7 @@ for framework in frameworks:
 for framework in weak_frameworks:
   pbx_object.add_file('System/Library/' + framework, tree='SDKROOT', weak=True)
 
+pbx_object.add_other_ldflags('-ObjC')
 
 pbx_object.save()
 
