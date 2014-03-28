@@ -760,7 +760,7 @@ public class AdColony : MonoBehaviour
     if(!adr_initialized) AndroidInitializePlugin();
     jvalue[] args = new jvalue[1];
     args[0].l = AndroidJNI.NewStringUTF( custom_id );
-    AndroidJNI.CallStaticStringMethod( class_UnityADC, method_setCustomID, args );
+    AndroidJNI.CallStaticVoidMethod( class_UnityADC, method_setCustomID, args );
   }
 
   static string AndroidGetCustomID()
