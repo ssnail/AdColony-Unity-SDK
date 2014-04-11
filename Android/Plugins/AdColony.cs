@@ -163,7 +163,7 @@ public class AdColony : MonoBehaviour
   //---------------------------------------------------------------------------
   //  PUBLIC INTERFACE - NON-IOS/NON-ANDROID (stub functionality)
   //---------------------------------------------------------------------------
-#if !UNITY_ANDROID && !UNITY_IPHONE
+#if (!UNITY_ANDROID && !UNITY_IPHONE) || UNITY_EDITOR
   static public void Configure( string app_version, string app_id, params string[] zone_ids )
   {
     if (configured) return;
@@ -200,7 +200,7 @@ public class AdColony : MonoBehaviour
   //---------------------------------------------------------------------------
   //  PUBLIC INTERFACE - IOS
   //---------------------------------------------------------------------------
-#if UNITY_IPHONE
+#if UNITY_IPHONE && !UNITY_EDITOR
   static public void SetCustomID( string custom_id )
   {
     IOSSetCustomID( custom_id );
@@ -351,7 +351,7 @@ public class AdColony : MonoBehaviour
   //---------------------------------------------------------------------------
   //  PUBLIC INTERFACE - ANDROID
   //---------------------------------------------------------------------------
-#if UNITY_ANDROID
+#if UNITY_ANDROID && !UNITY_EDITOR
   static public void Configure( string app_version, string app_id, params string[] zone_ids )
   {
     if (configured) return;
@@ -575,7 +575,7 @@ public class AdColony : MonoBehaviour
   //---------------------------------------------------------------------------
   //  IOS NATIVE INTERFACE
   //---------------------------------------------------------------------------
-#if UNITY_IPHONE
+#if UNITY_IPHONE && !UNITY_EDITOR
   [DllImport ("__Internal")]
   extern static private void IOSSetCustomID( string custom_id );
   [DllImport ("__Internal")]
@@ -612,7 +612,7 @@ public class AdColony : MonoBehaviour
   //---------------------------------------------------------------------------
   //  ANDROID NATIVE INTERFACE
   //---------------------------------------------------------------------------
-#if UNITY_ANDROID
+#if UNITY_ANDROID && !UNITY_EDITOR
   static bool adr_initialized = false;
   static AndroidJavaClass class_UnityPlayer;
   static IntPtr class_UnityADC           = IntPtr.Zero;
@@ -850,4 +850,5 @@ public class AdColony : MonoBehaviour
 
 #endif // UNITY_ANDROID
 }
+
 
