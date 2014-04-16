@@ -509,7 +509,7 @@ public class AdColony : MonoBehaviour
   void OnApplicationPause()
   {
     was_paused = true;
-  #if UNITY_ANDROID
+  #if UNITY_ANDROID && !UNITY_EDITOR
       AndroidPause();
     #endif
   }
@@ -519,7 +519,7 @@ public class AdColony : MonoBehaviour
     if (was_paused)
     {
       was_paused = false;
-      #if UNITY_ANDROID
+      #if UNITY_ANDROID && !UNITY_EDITOR
         AndroidResume();
       #endif
     }
@@ -612,6 +612,10 @@ public class AdColony : MonoBehaviour
   //---------------------------------------------------------------------------
   //  ANDROID NATIVE INTERFACE
   //---------------------------------------------------------------------------
+//#if UNITY_ANDROID && UNITY_PLAYER
+//  static void AndroidPause() { return; }
+//  static void AndroidResume() { return; }
+//#endif 
 #if UNITY_ANDROID && !UNITY_EDITOR
   static bool adr_initialized = false;
   static AndroidJavaClass class_UnityPlayer;
