@@ -55,6 +55,14 @@ Previously, The simplest way to obtain the AdColony Unity plugin was to click th
 ##Getting Started with AdColony:
 First time users should review the [quick start guide](https://github.com/AdColony/AdColony-Unity-SDK/wiki). Returning users should only need to update the AdColony SDK files in their projects (note, iOS developers, that the iOS SDK is now distributed as framework). Also with this release comes an update to the `OnVideoFinished` delegate signature, which now includes a boolean parameter. For returning users this change requires a small update to existing integrations. For more information, consult the `Updating from Earlier Versions` section of the Unity SDK documentation for your platform (Android or iOS).
 
+##Change Log (2014/07/23):
+* A new build script has been created in order to facilitate automated integration when building for iOS, using the AdColony-Unity-SDK. This build script is called `AdColonyPostProcessBuild.cs'
+  * This will now allow developers, who are targetting an iOS build, using the AdColony-Unity-SDK, to build and run automatically with-in Unity. The `AdColonyPostProcessBuild.cs` will handling linking the correct frameworks, and build settings needed for XCode to run.
+* With this new post process build script comes AdColony packages. These packages will be the new method in which developers can import the AdColony-Unity-SDK to their project
+  * There are two packages now available, one for users who are still developing with Unity versions less than Unity 4.3, and one package for those who are developing for Unity versions greater than or equal to Unity 4.3
+* New sample apps have been added, this is so that more clarity can be found when looking for example use cases.
+   * There is now a complex sample app that shows a suggested configuration that other developers might consider using when deciding how to implement their version of the AdColony-Unity-SDK. This is called the `AdColony AdManager`, but its file name is `ADCAdManager.cs`
+
 ##Change Log (2014/01/25):
 * Android SDK 2.0.6 integrated
 * Added `AndroidManifest_Unity43.xml` -- You must use this manifest if you are building with Unity 4.3.x, no change is necessary if you are using Unity 4.2.x and below.
