@@ -26,7 +26,7 @@ While this can be fixed through manual intervention it's been said that:
 
 "If you catch yourself doing something more than three times, it's time to automate."
 
-##### - Josh Connor
+##### - Joshua Connor
 
 ######      - Michael Scott
 
