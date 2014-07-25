@@ -47,11 +47,11 @@ Below are some screen shots demonstrating how your project hierarchy should look
 
 ####ProjectHierarchyConfigurationDefault:
 
-![Project Hierarchy Configuration Default](/images/ProjectHierarchyConfigurationDefault.png?raw=true "Project Hierarchy Configuration Default")
+![Project Hierarchy Configuration Default](https://github.com/AdColony/AdColony-Unity-SDK/blob/master/Documentation/AdColonyPostProcessBuild/images/ProjectHierarchyConfigurationDefault.png)
 
 ####ProjectHierarchyConfigurationNested:
 
-![Project Hierarchy Configuration Nested](/images/ProjectHierarchyConfigurationNested.png?raw=true "Project Hierarchy Configuration Nested")
+![Project Hierarchy Configuration Nested](https://github.com/AdColony/AdColony-Unity-SDK/blob/master/Documentation/AdColonyPostProcessBuild/images/ProjectHierarchyConfigurationNested.png)
 
 ---
 
