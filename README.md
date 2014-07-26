@@ -5,13 +5,18 @@ iOS SDK Version: 2.2.4
 Android SDK Version: 2.0.7
 
 ##To Download:
-To download specific package for importing into Unity select the following link that correctly matches your desired version. This should trigger the download, or a prompt asking where to save, for the selected package.
+To download the specific package for importing into Unity, select the following link that correctly matches your desired version. This should trigger the download, or a prompt asking where to save, for the selected package.
 
 [AdColony Pre Unity 4.3 Package](https://github.com/AdColony/AdColony-Unity-SDK/raw/master/Packages/AdColony%20Pre%20Unity%204.3%20Package.unitypackage) 
 
 [AdColony Post Unity 4.3 Package](https://github.com/AdColony/AdColony-Unity-SDK/raw/master/Packages/AdColony%20Post%20Unity%204.3%20Package.unitypackage) 
 
 Previously, The simplest way to obtain the AdColony Unity plugin was to click the `Download ZIP` button located in the right-hand navigation pane of this page. This method is still supported, however unless you're looking to obtain all the files within this repository this method is not suggested.
+
+##To Install
+To install the AdColony plug-in all you should need to do is import the package that matches the version of Unity you have. Upon importing, Unity should places the files in the correct location needed to support the AdColony SDK.
+
+If you're not familiar with the package import process with Unity [follow this link to read more about the process](http://docs.unity3d.com/Manual/HOWTO-exportpackage.html)
 
 ##Package Contents
 ###AdColony Pre Unity 4.3 Package Contains:
