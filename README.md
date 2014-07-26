@@ -14,7 +14,7 @@ To download the specific package for importing into Unity, select the following 
 Previously, The simplest way to obtain the AdColony Unity plugin was to click the `Download ZIP` button located in the right-hand navigation pane of this page. This method is still supported, however unless you're looking to obtain all the files within this repository this method is not suggested.
 
 ##To Install
-To install the AdColony plug-in all you should need to do is import the package that matches the version of Unity you have. Upon importing, Unity should places the files in the correct location needed to support the AdColony SDK.
+To install the AdColony plug-in all you should need to do is import the package that matches the version of Unity you have. Upon importing, Unity should place the files in the correct location needed to support the AdColony SDK.
 
 If you're not familiar with the package import process with Unity [follow this link to read more about the process](http://docs.unity3d.com/Manual/HOWTO-exportpackage.html)
 
