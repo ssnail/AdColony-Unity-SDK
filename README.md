@@ -1,8 +1,10 @@
 #AdColony Unity Plugin
-
 Modified: May 29th, 2014  
 iOS SDK Version: 2.2.4  
 Android SDK Version: 2.0.7
+
+##Getting Started with AdColony:
+First time users should review the [quick start guide](https://github.com/AdColony/AdColony-Unity-SDK/wiki). Returning users should only need to update the AdColony SDK files in their projects (note, iOS developers, that the iOS SDK is now distributed as framework). Also with this release comes an update to the `OnVideoFinished` delegate signature, which now includes a boolean parameter. For returning users this change requires a small update to existing integrations. For more information, consult the `Updating from Earlier Versions` section of the Unity SDK documentation for your platform (Android or iOS).
 
 ##To Download:
 To download the specific package for importing into Unity, select the following link that correctly matches your desired version. This should trigger the download, or a prompt asking where to save, for the selected package.
@@ -56,9 +58,6 @@ If you're not familiar with the package import process with Unity [follow this l
     * `ADCAdManager.cs`
     * `ADCVideoZone.cs`
     * `ADCVideoZoneType.cs`   
-
-##Getting Started with AdColony:
-First time users should review the [quick start guide](https://github.com/AdColony/AdColony-Unity-SDK/wiki). Returning users should only need to update the AdColony SDK files in their projects (note, iOS developers, that the iOS SDK is now distributed as framework). Also with this release comes an update to the `OnVideoFinished` delegate signature, which now includes a boolean parameter. For returning users this change requires a small update to existing integrations. For more information, consult the `Updating from Earlier Versions` section of the Unity SDK documentation for your platform (Android or iOS).
 
 ##Change Log (2014/07/23):
 * A new build script has been created in order to facilitate automated integration when building for iOS, using the AdColony-Unity-SDK. This build script is called `AdColonyPostProcessBuild.cs'
