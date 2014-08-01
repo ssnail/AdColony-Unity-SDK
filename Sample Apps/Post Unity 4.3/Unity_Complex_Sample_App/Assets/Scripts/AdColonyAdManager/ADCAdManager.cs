@@ -111,7 +111,7 @@ public class ADCAdManager : MonoBehaviour {
       AddZoneToManager("VideoZone1", "vzf8fb4670a60e4a139d01b5", ADCVideoZoneType.Interstitial);
       AddZoneToManager("VideoZone2", "vzf8fb4670a60e4a139d01b5", ADCVideoZoneType.Interstitial);
       // V4VC zones
-      AddZoneToManager("V4VCZone1", "vzf8e4e97704c4445c87504e", ADCVideoZoneType.Interstitial);
+      AddZoneToManager("V4VCZone1", "vzf8e4e97704c4445c87504e", ADCVideoZoneType.V4VC);
     #endif
   }
 
