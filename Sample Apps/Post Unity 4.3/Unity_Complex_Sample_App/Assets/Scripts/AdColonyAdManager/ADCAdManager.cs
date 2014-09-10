@@ -59,10 +59,10 @@ public class ADCAdManager : MonoBehaviour {
 
     // These set the delegate functions that are called when these events fired by the ADColony SDK.
     // This is done so that users can have custom methods to respond to these events.
-    AdColony.OnVideoStarted = OnVideoStarted;
-    AdColony.OnVideoFinished = OnVideoFinished;
-    AdColony.OnV4VCResult = OnV4VCResult;
-    AdColony.OnAdAvailabilityChange = OnAdAvailabilityChange;
+    AddOnVideoStartedMethod(OnVideoStarted);
+    AddOnVideoFinishedMethod(OnVideoFinished);
+    AddOnV4VCResultMethod(OnV4VCResult);
+    AddOnAdAvailabilityChangeMethod(OnAdAvailabilityChange);
 
     DontDestroyOnLoad(this.gameObject);
   }
@@ -225,7 +225,10 @@ public class ADCAdManager : MonoBehaviour {
     if(ContainsZoneKey(zoneKey)) {
       Debug.LogWarning("The ad manager overwrote the previous video zoneId: " + GetZoneIdByKey(zoneKey) + " for the video zone named " + zoneKey + " with the new video zoneId of: " + zoneId);
     }
-    ADCAdManager.GetVideoZonesDictionary().Add(zoneKey, new ADCVideoZone(zoneId, videoZoneType));
+    else {
+      Debug.LogWarning("The ad manager has added the video zone named " + zoneKey + " with the video zoneId of: " + zoneId);
+      ADCAdManager.GetVideoZonesDictionary().Add(zoneKey, new ADCVideoZone(zoneId, videoZoneType));
+    }
   }
 
   public static ADCVideoZone GetVideoZoneObjectByKey(string key) {
@@ -280,22 +283,29 @@ public class ADCAdManager : MonoBehaviour {
   }
 
   public static void ShowVideoAdByZoneKey(string zoneIdKey, bool offerV4VCBeforePlay = false, bool showPopUpAfter = false) {
+    ADCVideoZone videoZone = GetVideoZoneObjectByKey(zoneIdKey);
+    string zoneId = GetZoneIdByKey(zoneIdKey);
+
     if(IsVideoAvailableByZoneKey(zoneIdKey)) {
-      ADCVideoZone videoZone = GetVideoZoneObjectByKey(zoneIdKey);
       if(videoZone.zoneType == ADCVideoZoneType.Interstitial) {
-        AdColony.ShowVideoAd(GetZoneIdByKey(zoneIdKey));
+        AdColony.ShowVideoAd(zoneId);
       }
       else if(videoZone.zoneType == ADCVideoZoneType.V4VC) {
         if(offerV4VCBeforePlay) {
-          AdColony.OfferV4VC(showPopUpAfter, GetZoneIdByKey(zoneIdKey));
+          AdColony.OfferV4VC(showPopUpAfter, zoneId);
         }
         else {
-          AdColony.ShowV4VC(showPopUpAfter, GetZoneIdByKey(zoneIdKey));
+          AdColony.ShowV4VC(showPopUpAfter, zoneId);
         }
       }
       else {
         //Check nothing, video zone type isn't correct
+        Debug.Log("An incorrect video zone type was requested to play. Please resolve this issue.");
       }
+      Debug.Log("The zone '" + zoneId + "' was requested to play.");
+    }
+    else {
+      Debug.Log("The zone '" + zoneId + "' was requested to play, but it is NOT ready to play yet.");
     }
   }
 }
