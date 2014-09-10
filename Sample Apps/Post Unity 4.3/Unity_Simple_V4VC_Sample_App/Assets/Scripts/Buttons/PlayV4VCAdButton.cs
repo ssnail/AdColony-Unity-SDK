@@ -37,12 +37,12 @@ public class PlayV4VCAdButton : GUITextureButton {
     base.Start();
     ConfigureZoneString();
     AdColony.Configure(appVersion, appId, zoneId);
+    AdColony.OnAdAvailabilityChange = OnAdAvailabilityChange;
     AdColony.OnV4VCResult = UpdateCurrencyText;
 	}
 
 	// Update is called once per frame
 	void Update() {
-    PerformVideoReadyCheck();
 	}
 
   /// <summary>
@@ -67,8 +67,9 @@ public class PlayV4VCAdButton : GUITextureButton {
   /// <summary>
   /// This checks every update if the zone specified is ready to be played. If it is, it sets the GUITexture being used to display the status to the correct image.
   /// </summary>
-  public void PerformVideoReadyCheck() {
-    if(AdColony.IsVideoAvailable(zoneId)) {
+  public void OnAdAvailabilityChange(bool available, string zoneIdChanged) {
+    if(available
+       && zoneId == zoneIdChanged) {
       videoZoneStateTexture.texture = readyTexture;
     }
     else {
