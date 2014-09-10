@@ -8,6 +8,199 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 
+public class SectionPosition {
+  public int startLine = -1;
+  public int endLine = -1;
+  public int startCharIndex = -1;
+  public int endCharIndex = -1;
+
+  public SectionPosition(int newStartLine, int newStartCharIndex) {
+    startLine = newStartLine;
+    startCharIndex = newStartCharIndex;
+  }
+
+  public override string ToString() {
+    return "Start Line: " + startLine +  " StartCharIndex: " + startCharIndex + "\nEnd Line: " + endLine + " EndCharIndex: " + endCharIndex;
+  }
+}
+//-----------------------------------------
+public class Section {
+  public Section parentSection = null;
+  public List<SectionPosition> sectionPositions = null;
+  public List<Section> children = null;
+
+  public SectionPosition currentSectionPosition {
+    get {
+      return sectionPositions[sectionPositions.Count - 1];
+    }
+  }
+
+  public Section(SectionPosition startingCurrentSectionPosition) {
+    sectionPositions = new List<SectionPosition>();
+    children = new List<Section>();
+    sectionPositions.Add(startingCurrentSectionPosition);
+  }
+
+  public void AddChild(Section newChild) {
+    children.Add(newChild);
+  }
+}
+//-----------------------------------------
+public class SectionParser {
+  List<string> fileLines = null;
+  Section rootSection = null;
+  char startSectionDelimiterCharacter;
+  char endSectionDelimiterCharacter;
+
+  public SectionParser(List<string> newFileLines, char newStartSectionDelimiterCharacter, char newEndSectionDelimiterCharacter) {
+    fileLines = newFileLines;
+
+    startSectionDelimiterCharacter = newStartSectionDelimiterCharacter;
+    endSectionDelimiterCharacter = newEndSectionDelimiterCharacter;
+  }
+
+  public void ReconfigureParserSettings(List<string> newFileLines, char newStartSectionDelimiterCharacter, char newEndSectionDelimiterCharacter) {
+    fileLines = newFileLines;
+
+    startSectionDelimiterCharacter = newStartSectionDelimiterCharacter;
+    endSectionDelimiterCharacter = newEndSectionDelimiterCharacter;
+  }
+
+  public void ParseFileLines() {
+    rootSection = null;
+    Section currentSection = null;
+
+    for(int i = 0; i < fileLines.Count; i++) {
+      string currentLine = fileLines[i];
+      // Debug.Log("Current Line:\n" + currentLine);
+      for(int j = 0; j < currentLine.Length; j++) {
+        char currentCharacter = currentLine[j];
+
+        // start of a section
+        if(currentCharacter.Equals(startSectionDelimiterCharacter)) {
+          if(rootSection == null) {
+
+            rootSection = new Section(new SectionPosition(i, j));
+            currentSection = rootSection;
+          }
+          else {
+            currentSection.currentSectionPosition.endLine = i;
+            currentSection.currentSectionPosition.endCharIndex = j;
+
+            Section nestedSection = new Section(new SectionPosition(i,j));
+            nestedSection.parentSection = currentSection;
+
+            currentSection.AddChild(nestedSection);
+            currentSection = nestedSection;
+          }
+        }
+        // end of a section
+        if(currentCharacter.Equals(endSectionDelimiterCharacter)) {
+          if(rootSection == null) {
+            Debug.Log("CLOSING SECTION DELIMITER LOCATED WITHOUT ANY OPEN SECTION DELIMITER LOCATED. THIS IS AN ERROR, THE PASSED IN FILE IS IMPROPERLY FORMATTED.");
+          }
+          else {
+            currentSection.currentSectionPosition.endLine = i;
+            currentSection.currentSectionPosition.endCharIndex = j;
+
+            if(currentSection.parentSection != null) {
+              currentSection = currentSection.parentSection;
+              currentSection.sectionPositions.Add(new SectionPosition(i, j));
+            }
+            else {
+              // Debug.Log("A PARENT NODE OF NULL HAS BEEN ENCOUNTERED. THIS SHOULD BE THE ROOT OF THE TREE.");
+            }
+          }
+        }
+        else {
+          // do nothing, unrecognized token
+        }
+      }
+    }
+  }
+
+  public List<int[]> GetAllSectionStartAndEndLinesContainingString(string stringBeingSearchedFor) {
+    return SearchSectionForString(rootSection, stringBeingSearchedFor);
+  }
+
+  public List<int[]> SearchSectionForString(Section sectionBeingSearched, string stringBeingSearchedFor) {
+    List<int[]> locatedStartAndEndLines = new List<int[]>();
+
+    int[] searchResults = DoesSectionContainString(sectionBeingSearched, stringBeingSearchedFor);
+    if(searchResults != null) {
+      locatedStartAndEndLines.Add(searchResults);
+    }
+    foreach(Section childSection in sectionBeingSearched.children) {
+      List<int[]> returnedSearchResults = SearchSectionForString(childSection, stringBeingSearchedFor);
+      locatedStartAndEndLines.AddRange(returnedSearchResults);
+    }
+
+    return locatedStartAndEndLines;
+  }
+
+  public int[] DoesSectionContainString(Section sectionBeingSearched, string stringBeingSearchedFor) {
+    int smallestStartLineNumber = -1;
+    int largestEndLineNumber = -1;
+    bool foundStringBeingSearchedFor = false;
+
+    foreach(SectionPosition sectionPositionBeingSearched in sectionBeingSearched.sectionPositions) {
+      //-------------------
+      // used to track the correct start and end sections for the entire section
+      if(smallestStartLineNumber == -1
+         || sectionPositionBeingSearched.startLine < smallestStartLineNumber) {
+        smallestStartLineNumber = sectionPositionBeingSearched.startLine;
+      }
+      if(smallestStartLineNumber == -1
+         || sectionPositionBeingSearched.endLine > largestEndLineNumber) {
+        largestEndLineNumber = sectionPositionBeingSearched.endLine;
+      }
+      //-------------------
+
+      int lineTracker = sectionPositionBeingSearched.startLine;
+      int endLine = sectionPositionBeingSearched.endLine;
+
+      while(lineTracker <= endLine) {
+        string currentLine = fileLines[lineTracker];
+
+        if(lineTracker == sectionPositionBeingSearched.startLine
+           && lineTracker == sectionPositionBeingSearched.endLine) {
+          int sectionTextLength = (sectionPositionBeingSearched.endCharIndex - sectionPositionBeingSearched.startCharIndex);
+          if(currentLine.Substring(sectionPositionBeingSearched.startCharIndex, sectionTextLength).Contains(stringBeingSearchedFor)) {
+            // Debug.Log("LOCATED STRING ON LINE: " + lineTracker);
+            foundStringBeingSearchedFor = true;
+          }
+        }
+        else if(lineTracker == sectionPositionBeingSearched.startLine) {
+          int sectionTextLength = (currentLine.Length - sectionPositionBeingSearched.startCharIndex);
+          if(currentLine.Substring(sectionPositionBeingSearched.startCharIndex, sectionTextLength).Contains(stringBeingSearchedFor)) {
+            // Debug.Log("LOCATED STRING ON LINE: " + lineTracker);
+            foundStringBeingSearchedFor = true;
+          }
+        }
+        else if(lineTracker == endLine) {
+          if(currentLine.Substring(0, sectionPositionBeingSearched.endCharIndex).Contains(stringBeingSearchedFor)) {
+            // Debug.Log("LOCATED STRING ON LINE: " + lineTracker);
+            foundStringBeingSearchedFor = true;
+          }
+        }
+        else {
+          if(currentLine.Contains(stringBeingSearchedFor)) {
+            // Debug.Log("LOCATED STRING ON LINE: " + lineTracker);
+            foundStringBeingSearchedFor = true;
+          }
+        }
+        lineTracker++;
+      }
+    }
+
+    if(foundStringBeingSearchedFor) {
+      return new int[] { smallestStartLineNumber, largestEndLineNumber };
+    }
+
+    return null;
+  }
+}
+//-----------------------------------------
 /// <summary>
 /// This is a script that was created for modifying the generated XCode project
 /// created by Unity. This was done in order to add frameworks and build configurations
@@ -77,9 +270,9 @@ public static class AdColonyPostProcessBuild
   /// These are used as constant references for each specific section in the xcode project
   /// </summary>
   const string PBX_BUILD_FILE = "PBXBuildFile";
+  const string PBX_FILE_REFERENCE = "PBXFileReference";
   const string PBX_CONTAINER_ITEM_PROXY = "PBXContainerItemProxy";
   const string PBX_COPY_FILES_BUILD_PHASE = "PBXCopyFilesBuildPhase";
-  const string PBX_FILE_REFERENCE = "PBXFileReference";
   const string PBX_FRAMEWORKS_BUILD_PHASE = "PBXFrameworksBuildPhase";
   const string PBX_GROUP = "PBXGroup";
   const string PBX_NATIVE_TARGET = "PBXNativeTarget";
@@ -103,8 +296,10 @@ public static class AdColonyPostProcessBuild
   static int tabLength = 2;
   static string tabSpace = new string(' ', tabLength);
 
+  static SectionParser sectionParser = null;
+
   /// Processbuild Function
-  [PostProcessBuild] // <- this is where the magic happens, this attribute triggers unity to call this method when the build process has finished
+  [PostProcessBuild(200)] // <- this is where the magic happens, this attribute triggers unity to call this method when the build process has finished
   public static void OnPostProcessBuild(BuildTarget target, string path)
   {
       // Checks this is an iOS build before running
@@ -145,7 +340,7 @@ public static class AdColonyPostProcessBuild
         updateXcodeProject(xcodePBXProjectPath, xcodeCustomThirdPartyDirectoryPath, frameworksToAdd) ;
       }
      #endif
-      // Debug.Log("OnPostProcessBuild - STOP") ;
+     Debug.Log("ADCOLONY POST PROCESS BUILD HAS FINISHED") ;
   }
 
   /// <summary>
@@ -157,47 +352,48 @@ public static class AdColonyPostProcessBuild
   /// <param name="frameworksToAdd">This is an array of frameworks that will be added to the pbxproj file.</param>
   public static void updateXcodeProject(string pbxProjectFilePath, string thirdPartyFrameworkDirectoryPath, Framework[] frameworksToAdd)
   {
-      // STEP 1: Open the pbx project file and read in the lines to a list so it can have new lines injected
-      string[] lines = System.IO.File.ReadAllLines(pbxProjectFilePath);
-      List<string> linesList = new List<string>();
-      foreach(string line in lines) {
-        linesList.Add(line);
-      }
+    // STEP 1: Open the pbx project file and read in the lines to a list so it can have new lines injected
+    string[] lines = System.IO.File.ReadAllLines(pbxProjectFilePath);
+    List<string> linesList = new List<string>();
+    foreach(string line in lines) {
+      linesList.Add(line);
+    }
+    sectionParser = new SectionParser(linesList, '{', '}');
 
-      // STEP 2: Next check which frameworks have already been added. If they have been added don't bother adding them
-      //         This is probably redundant, but it felt like it was something worthwhile to do
-      MarkFrameworksAlreadyAdded(lines, frameworksToAdd);
-      // Debug.Log("Frameworks being added to the XCode Project:");
-      foreach(Framework framework in frameworksToAdd) {
-        if(!framework.hasBeenAdded) {
-          Debug.Log(framework.name + " will be added to the XCode project.");
-        }
+    // STEP 2: Next check which frameworks have already been added. If they have been added don't bother adding them
+    //         This is probably redundant, but it felt like it was something worthwhile to do
+    MarkFrameworksAlreadyAdded(lines, frameworksToAdd);
+    // Debug.Log("Frameworks being added to the XCode Project:");
+    foreach(Framework framework in frameworksToAdd) {
+      if(!framework.hasBeenAdded) {
+        // Debug.Log(framework.name + " will be added to the XCode project.");
       }
+    }
 
-      // STEP 3: Next each section in the pbxproj file will be modified to include the passed in list of
-      Debug.Log("Adding frameworks to the PBXBuildFile section.");
-      AddFrameworksToPBXBuildFileSection(linesList, frameworksToAdd);
-      // Debug.Log("-------------------------------------------------");
-      Debug.Log("Adding frameworks to the PBXBuildFileReference section.");
-      AddFrameworksToPBXBuildFileReferenceSection(linesList, frameworksToAdd);
-      // Debug.Log("-------------------------------------------------");
-      Debug.Log("Adding frameworks to the PBXFrameworksBuildPhase section.");
-      AddFrameworksToPBXFrameworksBuildPhaseSection(linesList, frameworksToAdd);
-      // Debug.Log("-------------------------------------------------");
-      Debug.Log("Adding frameworks to the PBXGroup section.");
-      AddFrameworksToPBXGroupSection(linesList, frameworksToAdd);
-      // Debug.Log("-------------------------------------------------");
-      Debug.Log("Adding build settings to targets.");
-      AddConfigurationsToXCBuildConfiguration(linesList, thirdPartyFrameworkDirectoryPath, frameworksToAdd);
+    // STEP 3: Next each section in the pbxproj file will be modified to include the passed in list of
+    Debug.Log("AdColony is adding frameworks to the PBXBuildFile section.");
+    AddFrameworksToPBXBuildFileSection(linesList, frameworksToAdd);
+    // Debug.Log("-------------------------------------------------");
+    Debug.Log("AdColony is adding frameworks to the PBXBuildFileReference section.");
+    AddFrameworksToPBXFileReferenceSection(linesList, frameworksToAdd);
+    // Debug.Log("-------------------------------------------------");
+    Debug.Log("AdColony is adding frameworks to the PBXFrameworksBuildPhase section.");
+    AddFrameworksToPBXFrameworksBuildPhaseSection(linesList, frameworksToAdd);
+    // Debug.Log("-------------------------------------------------");
+    Debug.Log("AdColony is adding frameworks to the PBXGroup section.");
+    AddFrameworksToPBXGroupSection(linesList, frameworksToAdd);
+    // Debug.Log("-------------------------------------------------");
+    // Debug.Log("AdColony is adding build settings to targets.");
+    AddConfigurationsToXCBuildConfiguration(linesList, thirdPartyFrameworkDirectoryPath, frameworksToAdd);
 
-      // STEP 4: Output the finally configured pbxproj file lines to the new file
-      FileStream filestr = new FileStream(pbxProjectFilePath, FileMode.Create); //Create new file and open it for read and write, if the file exists overwrite it.
-      filestr.Close() ;
-      StreamWriter fCurrentXcodeProjFile = new StreamWriter(pbxProjectFilePath) ; // will be used for writing
-      foreach(string line in linesList) {
-        fCurrentXcodeProjFile.WriteLine(line);
-      }
-      fCurrentXcodeProjFile.Close();
+    // STEP 4: Output the finally configured pbxproj file lines to the new file
+    FileStream filestr = new FileStream(pbxProjectFilePath, FileMode.Create); //Create new file and open it for read and write, if the file exists overwrite it.
+    filestr.Close() ;
+    StreamWriter fCurrentXcodeProjFile = new StreamWriter(pbxProjectFilePath) ; // will be used for writing
+    foreach(string line in linesList) {
+      fCurrentXcodeProjFile.WriteLine(line);
+    }
+    fCurrentXcodeProjFile.Close();
   }
   //-----------------------------------------
   /// <summary>
@@ -207,10 +403,8 @@ public static class AdColonyPostProcessBuild
   /// <param name="frameworksToAdd">This is an array of frameworks that will be added to the pbxproj file.</param>
   private static void MarkFrameworksAlreadyAdded(string[] pbxprojFileLines, Framework[] frameworksToAdd) {
     foreach(string pbxprojFileLine in pbxprojFileLines) {
-      // Debug.Log(pbxprojFileLine);
       foreach(Framework framework in frameworksToAdd) {
         if(pbxprojFileLine.Contains(framework.name)) {
-          // Debug.Log("framework " + framework.name + " has already been added");
           framework.hasBeenAdded = true;
         }
       }
@@ -226,17 +420,19 @@ public static class AdColonyPostProcessBuild
   /// <param name="pbxprojFileLines">This is the list of lines that are in a pbxproj file and will be modified to inject the new project lines.</param>
   /// <param name="frameworksToAdd">This is an array of frameworks that will be added to the pbxproj file.</param>
   private static void AddFrameworksToPBXBuildFileSection(List<string> pbxprojFileLines, Framework[] frameworksToAdd) {
-    List<int[]> sectionStartAndEndLines = LocateSectionStartAndEndLines(pbxprojFileLines, 0, pbxprojFileLines.Count, GetBeginSectionRegex(PBX_BUILD_FILE), GetEndSectionRegex(PBX_BUILD_FILE));
+    string stringToSearchFor = "isa = " + PBX_BUILD_FILE;
+    List<int[]> sectionStartAndEndLines = null;
+    sectionParser.ReconfigureParserSettings(pbxprojFileLines, '{', '}');
+    sectionParser.ParseFileLines();
+    sectionStartAndEndLines = sectionParser.GetAllSectionStartAndEndLinesContainingString(stringToSearchFor);
 
-    foreach(int[] sectionStartAndEndLineNumbers in sectionStartAndEndLines) {
-      // Debug.Log(PBX_BUILD_FILE + " Section Start Line: " + sectionStartAndEndLineNumbers[0] + "\nEnd Line: " + sectionStartAndEndLineNumbers[1]);
-      pbxprojFileLines.Insert(sectionStartAndEndLineNumbers[0], tabSpace + tabSpace + "/* END OF ADCOLONY INJECTED FILES */");
-      foreach(Framework framework in frameworksToAdd) {
-        string buildFileStringToInject = CreatePBXBuildFileStringToInject(framework);
-        pbxprojFileLines.Insert(sectionStartAndEndLineNumbers[0], buildFileStringToInject);
-      }
-      pbxprojFileLines.Insert(sectionStartAndEndLineNumbers[0], tabSpace + tabSpace + "/* START OF ADCOLONY INJECTED FILES */");
+    int startLine = sectionStartAndEndLines[0][0];
+    pbxprojFileLines.Insert(startLine, tabSpace + tabSpace + "/* END OF ADCOLONY INJECTED FILES */");
+    foreach(Framework framework in frameworksToAdd) {
+      string buildFileStringToInject = CreatePBXBuildFileStringToInject(framework);
+      pbxprojFileLines.Insert(startLine, buildFileStringToInject);
     }
+    pbxprojFileLines.Insert(startLine, tabSpace + tabSpace + "/* START OF ADCOLONY INJECTED FILES */");
   }
   //-----------------------------------------
   /// <summary>
@@ -244,19 +440,20 @@ public static class AdColonyPostProcessBuild
   /// </summary>
   /// <param name="pbxprojFileLines">This is the list of lines that are in a pbxproj file and will be modified to inject the new project lines.</param>
   /// <param name="frameworksToAdd">This is an array of frameworks that will be added to the pbxproj file.</param>
-  private static void AddFrameworksToPBXBuildFileReferenceSection(List<string> pbxprojFileLines, Framework[] frameworksToAdd) {
-    List<int[]> sectionStartAndEndLines = LocateSectionStartAndEndLines(pbxprojFileLines, 0, pbxprojFileLines.Count, GetBeginSectionRegex(PBX_FILE_REFERENCE), GetEndSectionRegex(PBX_FILE_REFERENCE));
+  private static void AddFrameworksToPBXFileReferenceSection(List<string> pbxprojFileLines, Framework[] frameworksToAdd) {
+    string stringToSearchFor = "isa = " + PBX_FILE_REFERENCE;
+    List<int[]> sectionStartAndEndLines = null;
+    sectionParser.ReconfigureParserSettings(pbxprojFileLines, '{', '}');
+    sectionParser.ParseFileLines();
+    sectionStartAndEndLines = sectionParser.GetAllSectionStartAndEndLinesContainingString(stringToSearchFor);
 
-    foreach(int[] sectionStartAndEndLineNumbers in sectionStartAndEndLines) {
-      // Debug.Log(PBX_FILE_REFERENCE + "Section Start Line: " + sectionStartAndEndLineNumbers[0] + "\nEnd Line: " + sectionStartAndEndLineNumbers[1]);
-
-      pbxprojFileLines.Insert(sectionStartAndEndLineNumbers[0], tabSpace + tabSpace + "/* END OF ADCOLONY INJECTED FILES */");
-      foreach(Framework framework in frameworksToAdd) {
-        string buildFileReferenceStringToInject = CreatePBXBuildFileReferenceStringToInject(framework);
-        pbxprojFileLines.Insert(sectionStartAndEndLineNumbers[0], buildFileReferenceStringToInject);
-      }
-      pbxprojFileLines.Insert(sectionStartAndEndLineNumbers[0], tabSpace + tabSpace + "/* START OF ADCOLONY INJECTED FILES */");
+    int startLine = sectionStartAndEndLines[0][0];
+    pbxprojFileLines.Insert(startLine, tabSpace + tabSpace + "/* END OF ADCOLONY INJECTED FILES */");
+    foreach(Framework framework in frameworksToAdd) {
+      string buildFileReferenceStringToInject = CreatePBXBuildFileReferenceStringToInject(framework);
+      pbxprojFileLines.Insert(startLine, buildFileReferenceStringToInject);
     }
+    pbxprojFileLines.Insert(startLine, tabSpace + tabSpace + "/* START OF ADCOLONY INJECTED FILES */");
   }
   //-----------------------------------------
   /// <summary>
@@ -265,35 +462,26 @@ public static class AdColonyPostProcessBuild
   /// <param name="pbxprojFileLines">This is the list of lines that are in a pbxproj file and will be modified to inject the new project lines.</param>
   /// <param name="frameworksToAdd">This is an array of frameworks that will be added to the pbxproj file.</param>
   private static void AddFrameworksToPBXFrameworksBuildPhaseSection(List<string> pbxprojFileLines, Framework[] frameworksToAdd) {
-    List<int[]> sectionStartAndEndLines = LocateSectionStartAndEndLines(pbxprojFileLines, 0, pbxprojFileLines.Count, GetBeginSectionRegex(PBX_FRAMEWORKS_BUILD_PHASE), GetEndSectionRegex(PBX_FRAMEWORKS_BUILD_PHASE));
+    string stringToSearchFor = "isa = " + PBX_FRAMEWORKS_BUILD_PHASE;
+    List<int[]> sectionStartAndEndLines = null;
+    sectionParser.ReconfigureParserSettings(pbxprojFileLines, '{', '}');
+    sectionParser.ParseFileLines();
+    sectionStartAndEndLines = sectionParser.GetAllSectionStartAndEndLinesContainingString(stringToSearchFor);
 
     foreach(int[] sectionStartAndEndLineNumbers in sectionStartAndEndLines) {
-      // Debug.Log(PBX_FRAMEWORKS_BUILD_PHASE + "Section Start Line: " + sectionStartAndEndLineNumbers[0] + "\nEnd Line: " + sectionStartAndEndLineNumbers[1]);
-
       List<int[]> fileSubSectionStartAndEndLines = LocateSectionStartAndEndLines(pbxprojFileLines, sectionStartAndEndLineNumbers[0], sectionStartAndEndLineNumbers[1], @"^\s*(files = \()\s*$", @"^\s*(\);)\s*$");
-      // Debug.Log("File sections length: " + fileSubSectionStartAndEndLines.Count);
 
-      int fileSectionTracker = 0;
-      int[] fileSectionsToInjectInto = new int[] { 0 };
       int multipleSubSectionOffset = 0;
-      while(fileSectionTracker < fileSubSectionStartAndEndLines.Count) {
-
-        if(Array.IndexOf(fileSectionsToInjectInto, fileSectionTracker) > (-1)) {
-          int[] fileSubSectionStartAndEndLineNumbers = fileSubSectionStartAndEndLines[fileSectionTracker];
-          // Debug.Log("File Section Start Line: " + fileSubSectionStartAndEndLineNumbers[0] + "\nEnd Line: " + fileSubSectionStartAndEndLineNumbers[1]);
-
-          pbxprojFileLines.Insert((fileSubSectionStartAndEndLineNumbers[0] + multipleSubSectionOffset), tabSpace + tabSpace + tabSpace + tabSpace + "/* START OF ADCOLONY INJECTED FILES */");
-          multipleSubSectionOffset++;
-          foreach(Framework framework in frameworksToAdd) {
-            string buildFrameworksBuildPhaseFileStringToInject = CreateFileSubsectionStringToInject(framework);
-            pbxprojFileLines.Insert((fileSubSectionStartAndEndLineNumbers[0] + multipleSubSectionOffset), buildFrameworksBuildPhaseFileStringToInject);
-            multipleSubSectionOffset++;
-          }
-          pbxprojFileLines.Insert((fileSubSectionStartAndEndLineNumbers[0] + multipleSubSectionOffset), tabSpace + tabSpace + tabSpace + tabSpace + "/* END OF ADCOLONY INJECTED FILES */");
+      foreach(int[] fileSubSectionStartAndEndLine in fileSubSectionStartAndEndLines) {
+        pbxprojFileLines.Insert((fileSubSectionStartAndEndLine[0] + multipleSubSectionOffset), tabSpace + tabSpace + tabSpace + tabSpace + "/* START OF ADCOLONY INJECTED FILES */");
+        multipleSubSectionOffset++;
+        foreach(Framework framework in frameworksToAdd) {
+          string buildFrameworksBuildPhaseFileStringToInject = CreateFileSubsectionStringToInject(framework);
+          pbxprojFileLines.Insert((fileSubSectionStartAndEndLine[0] + multipleSubSectionOffset), buildFrameworksBuildPhaseFileStringToInject);
           multipleSubSectionOffset++;
         }
-
-        fileSectionTracker++;
+        pbxprojFileLines.Insert((fileSubSectionStartAndEndLine[0] + multipleSubSectionOffset), tabSpace + tabSpace + tabSpace + tabSpace + "/* END OF ADCOLONY INJECTED FILES */");
+        multipleSubSectionOffset++;
       }
     }
   }
@@ -304,35 +492,32 @@ public static class AdColonyPostProcessBuild
   /// <param name="pbxprojFileLines">This is the list of lines that are in a pbxproj file and will be modified to inject the new project lines.</param>
   /// <param name="frameworksToAdd">This is an array of frameworks that will be added to the pbxproj file.</param>
   private static void AddFrameworksToPBXGroupSection(List<string> pbxprojFileLines, Framework[] frameworksToAdd) {
-    List<int[]> sectionStartAndEndLines = LocateSectionStartAndEndLines(pbxprojFileLines, 0, pbxprojFileLines.Count, GetBeginSectionRegex(PBX_GROUP), GetEndSectionRegex(PBX_GROUP));
+    string stringToSearchFor = "isa = " + PBX_GROUP;
+    List<int[]> sectionStartAndEndLines = null;
+    sectionParser.ReconfigureParserSettings(pbxprojFileLines, '{', '}');
+    sectionParser.ParseFileLines();
+    sectionStartAndEndLines = sectionParser.GetAllSectionStartAndEndLinesContainingString(stringToSearchFor);
 
     foreach(int[] sectionStartAndEndLineNumbers in sectionStartAndEndLines) {
+      bool isFrameworksPBXGroup = pbxprojFileLines[sectionStartAndEndLineNumbers[0]].Contains("Frameworks");
+      if(isFrameworksPBXGroup) {
+        List<int[]> fileSubSectionStartAndEndLines = LocateSectionStartAndEndLines(pbxprojFileLines, sectionStartAndEndLineNumbers[0], sectionStartAndEndLineNumbers[1], @"^\s*(children = \()\s*$", @"^\s*(\);)\s*$");
+        foreach(int[] fileSubSectionStartAndEndLine in fileSubSectionStartAndEndLines) {
+          int multipleSubSectionOffset = 0;
 
-      // Debug.Log(PBX_GROUP + "Section Start Line: " + sectionStartAndEndLineNumbers[0] + "\nEnd Line: " + sectionStartAndEndLineNumbers[1]);
-      List<int[]> fileSubSectionStartAndEndLines = LocateSectionStartAndEndLines(pbxprojFileLines, sectionStartAndEndLineNumbers[0], sectionStartAndEndLineNumbers[1], @"^\s*(children = \()\s*$", @"^\s*(\);)\s*$");
-
-      int childrenSectionTracker = 0;
-      int[] childrenSectionsToInjectInto = new int[] { 2 };
-      int multipleSubSectionOffset = 0;
-      while(childrenSectionTracker < fileSubSectionStartAndEndLines.Count) {
-      // foreach(int[] fileSubSectionStartAndEndLineNumbers in fileSubSectionStartAndEndLines) {
-
-        if(Array.IndexOf(childrenSectionsToInjectInto, childrenSectionTracker) > (-1)) {
-          int[] fileSubSectionStartAndEndLineNumbers = fileSubSectionStartAndEndLines[childrenSectionTracker];
-          // Debug.Log("Children Section Start Line: " + fileSubSectionStartAndEndLineNumbers[0] + "\nEnd Line: " + fileSubSectionStartAndEndLineNumbers[1]);
-
-          pbxprojFileLines.Insert((fileSubSectionStartAndEndLineNumbers[0] + multipleSubSectionOffset), tabSpace + tabSpace + tabSpace + tabSpace + "/* START OF ADCOLONY INJECTED FILES */");
+          pbxprojFileLines.Insert((fileSubSectionStartAndEndLine[0] + multipleSubSectionOffset), tabSpace + tabSpace + tabSpace + tabSpace + "/* START OF ADCOLONY INJECTED FILES */");
           multipleSubSectionOffset++;
           foreach(Framework framework in frameworksToAdd) {
             string buildPBXGroupChildrenStringToInject = CreatePBXGroupChildrenSubsectionStringToInject(framework);
-            pbxprojFileLines.Insert((fileSubSectionStartAndEndLineNumbers[0] + multipleSubSectionOffset), buildPBXGroupChildrenStringToInject);
+            pbxprojFileLines.Insert((fileSubSectionStartAndEndLine[0] + multipleSubSectionOffset), buildPBXGroupChildrenStringToInject);
             multipleSubSectionOffset++;
           }
-          pbxprojFileLines.Insert((fileSubSectionStartAndEndLineNumbers[0] + multipleSubSectionOffset), tabSpace + tabSpace + tabSpace + tabSpace + "/* END OF ADCOLONY INJECTED FILES */");
+          pbxprojFileLines.Insert((fileSubSectionStartAndEndLine[0] + multipleSubSectionOffset), tabSpace + tabSpace + tabSpace + tabSpace + "/* END OF ADCOLONY INJECTED FILES */");
           multipleSubSectionOffset++;
         }
-
-        childrenSectionTracker++;
+      }
+      else {
+        // Debug.Log("THE PBXGROUP 'Frameworks' HAS NOT BEEN LOCATED! FRAMEWORKS WILL NOT BE ADDED TO THE PBXGROUP!");
       }
     }
   }
@@ -351,85 +536,80 @@ public static class AdColonyPostProcessBuild
     string objCFlagToAdd = tabSpace + tabSpace + tabSpace + tabSpace + tabSpace + "-ObjC,";
 
     // Starts the dive into XCBuildConfiguration section
-    List<int[]> sectionStartAndEndLines = LocateSectionStartAndEndLines(pbxprojFileLines, 0, pbxprojFileLines.Count, GetBeginSectionRegex(XC_BUILD_CONFIGURATION), GetEndSectionRegex(XC_BUILD_CONFIGURATION));
+    // List<int[]> sectionStartAndEndLines = LocateSectionStartAndEndLines(pbxprojFileLines, 0, pbxprojFileLines.Count, GetBeginSectionRegex(XC_BUILD_CONFIGURATION), GetEndSectionRegex(XC_BUILD_CONFIGURATION));
+    string stringToSearchFor = "isa = " + XC_BUILD_CONFIGURATION;
+    List<int[]> sectionStartAndEndLines = null;
+    sectionParser.ReconfigureParserSettings(pbxprojFileLines, '{', '}');
+    sectionParser.ParseFileLines();
+    sectionStartAndEndLines = sectionParser.GetAllSectionStartAndEndLinesContainingString(stringToSearchFor);
     foreach(int[] sectionStartAndEndLineNumbers in sectionStartAndEndLines) {
-      // Debug.Log(XC_BUILD_CONFIGURATION + "Section Start Line: " + sectionStartAndEndLineNumbers[0] + "\nEnd Line: " + sectionStartAndEndLineNumbers[1]);
-
       //------------------------------------------------------------------------
       // Starts the dive into XCBuildConfiguration - Build Settings section
-      List<int[]> buildSettingsSectionStartAndEndLines = LocateSectionStartAndEndLines(pbxprojFileLines, sectionStartAndEndLineNumbers[0], sectionStartAndEndLineNumbers[1], @"^\s*buildSettings = {\s*$", @"^\s*(\};)\s*$");
+      List<int[]> buildSettingsSectionStartAndEndLines = LocateSectionStartAndEndLines(pbxprojFileLines, (sectionStartAndEndLineNumbers[0] + addedLinesOffset), (sectionStartAndEndLineNumbers[1] + addedLinesOffset), @"^\s*buildSettings = {\s*$", @"^\s*(\};)\s*$");
       foreach(int[] buildSettingsStartAndEndLineNumbers in buildSettingsSectionStartAndEndLines) {
-        // Debug.Log("Build Settings Start Line: " + buildSettingsStartAndEndLineNumbers[0] + "\nEnd Line: " + buildSettingsStartAndEndLineNumbers[1]);
-
         //----------------------------------------------------------------------
         // Starts the dive into Search - FRAMEWORK_SEARCH_PATHS section
         List<int[]> frameworkSearchPathSectionStartAndEndLines = LocateSectionStartAndEndLines(pbxprojFileLines, buildSettingsStartAndEndLineNumbers[0], buildSettingsStartAndEndLineNumbers[1], @"^\s*FRAMEWORK_SEARCH_PATHS = \(\s*$", @"^\s*\);\s*$");
         // If no FRAMEWORK_SEARCH_PATHS section was NOT found
         if(frameworkSearchPathSectionStartAndEndLines.Count == 0) {
-          pbxprojFileLines.Insert((buildSettingsStartAndEndLineNumbers[0] + addedLinesOffset), tabSpace + tabSpace + tabSpace + tabSpace + "/* START OF ADCOLONY INJECTED FILES */");
+          pbxprojFileLines.Insert((buildSettingsStartAndEndLineNumbers[0] + 0), tabSpace + tabSpace + tabSpace + tabSpace + "/* START OF ADCOLONY INJECTED FILES */");
           addedLinesOffset++;
 
-          pbxprojFileLines.Insert((buildSettingsStartAndEndLineNumbers[0] + addedLinesOffset), tabSpace + tabSpace + tabSpace + tabSpace + "FRAMEWORK_SEARCH_PATHS = (");
+          pbxprojFileLines.Insert((buildSettingsStartAndEndLineNumbers[0] + 1), tabSpace + tabSpace + tabSpace + tabSpace + "FRAMEWORK_SEARCH_PATHS = (");
           addedLinesOffset++;
 
-          pbxprojFileLines.Insert((buildSettingsStartAndEndLineNumbers[0] + addedLinesOffset), thirdPartyFrameworkPathToAdd);
+          pbxprojFileLines.Insert((buildSettingsStartAndEndLineNumbers[0] + 2), thirdPartyFrameworkPathToAdd);
           addedLinesOffset++;
 
-          pbxprojFileLines.Insert((buildSettingsStartAndEndLineNumbers[0] + addedLinesOffset), tabSpace + tabSpace + tabSpace + tabSpace + ");");
+          pbxprojFileLines.Insert((buildSettingsStartAndEndLineNumbers[0] + 3), tabSpace + tabSpace + tabSpace + tabSpace + ");");
           addedLinesOffset++;
 
-          pbxprojFileLines.Insert((buildSettingsStartAndEndLineNumbers[0] + addedLinesOffset), tabSpace + tabSpace + tabSpace + tabSpace + "/* END OF ADCOLONY INJECTED FILES */");
+          pbxprojFileLines.Insert((buildSettingsStartAndEndLineNumbers[0] + 4), tabSpace + tabSpace + tabSpace + tabSpace + "/* END OF ADCOLONY INJECTED FILES */");
           addedLinesOffset++;
         }
         // If a FRAMEWORK_SEARCH_PATHS has was found
         else {
           foreach(int[] frameworkSearchPathSectionStartAndEndLineNumbers in frameworkSearchPathSectionStartAndEndLines) {
-            // Debug.Log("Framework Search Path Start Line: " + frameworkSearchPathSectionStartAndEndLineNumbers[0] + "\nEnd Line: " + frameworkSearchPathSectionStartAndEndLineNumbers[1]);
-
             pbxprojFileLines.Insert(frameworkSearchPathSectionStartAndEndLineNumbers[0], tabSpace + tabSpace + tabSpace + tabSpace + tabSpace + "/* START OF ADCOLONY INJECTED FILES */");
             addedLinesOffset++;
 
-            pbxprojFileLines.Insert(frameworkSearchPathSectionStartAndEndLineNumbers[0], thirdPartyFrameworkPathToAdd);
+            pbxprojFileLines.Insert(frameworkSearchPathSectionStartAndEndLineNumbers[0] + 1, thirdPartyFrameworkPathToAdd);
             addedLinesOffset++;
 
-            pbxprojFileLines.Insert(frameworkSearchPathSectionStartAndEndLineNumbers[0], tabSpace + tabSpace + tabSpace + tabSpace + tabSpace + "/* END OF ADCOLONY INJECTED FILES */");
+            pbxprojFileLines.Insert(frameworkSearchPathSectionStartAndEndLineNumbers[0] + 2, tabSpace + tabSpace + tabSpace + tabSpace + tabSpace + "/* END OF ADCOLONY INJECTED FILES */");
             addedLinesOffset++;
           }
         }
         //----------------------------------------------------------------------
-        // Debug.Log("Build Settings Start Line: " + buildSettingsStartAndEndLineNumbers[0] + "\nEnd Line: " + buildSettingsStartAndEndLineNumbers[1]);
         // Starts the dive into Search - OTHER_LDFLAGS section
         List<int[]> otherLDFlagsSectionStartAndEndLines = LocateSectionStartAndEndLines(pbxprojFileLines, buildSettingsStartAndEndLineNumbers[0], buildSettingsStartAndEndLineNumbers[1], @"^\s*OTHER_LDFLAGS = \(\s*$", @"^\s*\);\s*$");
         // If no OTHER_LDFLAGS section was NOT found
         if(otherLDFlagsSectionStartAndEndLines.Count == 0) {
-          pbxprojFileLines.Insert((buildSettingsStartAndEndLineNumbers[0] + addedLinesOffset), tabSpace + tabSpace + tabSpace + tabSpace + "/* START OF ADCOLONY INJECTED FILES */");
+          pbxprojFileLines.Insert((buildSettingsStartAndEndLineNumbers[0] + 0), tabSpace + tabSpace + tabSpace + tabSpace + "/* START OF ADCOLONY INJECTED FILES */");
           addedLinesOffset++;
 
-          pbxprojFileLines.Insert((buildSettingsStartAndEndLineNumbers[0] + addedLinesOffset), tabSpace + tabSpace + tabSpace + tabSpace + "OTHER_LDFLAGS = (");
+          pbxprojFileLines.Insert((buildSettingsStartAndEndLineNumbers[0] + 1), tabSpace + tabSpace + tabSpace + tabSpace + "OTHER_LDFLAGS = (");
           addedLinesOffset++;
 
-          pbxprojFileLines.Insert((buildSettingsStartAndEndLineNumbers[0] + addedLinesOffset), objCFlagToAdd);
+          pbxprojFileLines.Insert((buildSettingsStartAndEndLineNumbers[0] + 2), objCFlagToAdd);
           addedLinesOffset++;
 
-          pbxprojFileLines.Insert((buildSettingsStartAndEndLineNumbers[0] + addedLinesOffset), tabSpace + tabSpace + tabSpace + tabSpace + ");");
+          pbxprojFileLines.Insert((buildSettingsStartAndEndLineNumbers[0] + 3), tabSpace + tabSpace + tabSpace + tabSpace + ");");
           addedLinesOffset++;
 
-          pbxprojFileLines.Insert((buildSettingsStartAndEndLineNumbers[0] + addedLinesOffset), tabSpace + tabSpace + tabSpace + tabSpace + "/* END OF ADCOLONY INJECTED FILES */");
+          pbxprojFileLines.Insert((buildSettingsStartAndEndLineNumbers[0] + 4), tabSpace + tabSpace + tabSpace + tabSpace + "/* END OF ADCOLONY INJECTED FILES */");
           addedLinesOffset++;
         }
         // If a OTHER_LDFLAGS has was found
         else {
-          // Debug.Log("Build Settings Start Line: " + buildSettingsStartAndEndLineNumbers[0] + "\nEnd Line: " + buildSettingsStartAndEndLineNumbers[1]);
           foreach(int[] otherLDFlagsSectionStartAndEndLineNumbers in otherLDFlagsSectionStartAndEndLines) {
-            // Debug.Log("Framework Search Path Start Line: " + otherLDFlagsSectionStartAndEndLineNumbers[0] + "\nEnd Line: " + otherLDFlagsSectionStartAndEndLineNumbers[1]);
-
             pbxprojFileLines.Insert(otherLDFlagsSectionStartAndEndLineNumbers[0], tabSpace + tabSpace + tabSpace + tabSpace + tabSpace + "/* START OF ADCOLONY INJECTED FILES */");
             addedLinesOffset++;
 
-            pbxprojFileLines.Insert(otherLDFlagsSectionStartAndEndLineNumbers[0], objCFlagToAdd);
+            pbxprojFileLines.Insert(otherLDFlagsSectionStartAndEndLineNumbers[0] + 1, objCFlagToAdd);
             addedLinesOffset++;
 
-            pbxprojFileLines.Insert(otherLDFlagsSectionStartAndEndLineNumbers[0], tabSpace + tabSpace + tabSpace + tabSpace + tabSpace + "/* END OF ADCOLONY INJECTED FILES */");
+            pbxprojFileLines.Insert(otherLDFlagsSectionStartAndEndLineNumbers[0] + 2, tabSpace + tabSpace + tabSpace + tabSpace + tabSpace + "/* END OF ADCOLONY INJECTED FILES */");
             addedLinesOffset++;
           }
         }
@@ -601,7 +781,6 @@ public static class AdColonyPostProcessBuild
   /// <param name="projectRootDirectory">This is the Assets folder for the unity project being built</param>
   /// <param name="targetDirectory">This is the target directory that the frameworks should be copied to.</param>
   private static void CopyOverThirdPartyFrameworks(string projectRootDirectory, string targetDirectory) {
-    // Debug.Log("Root project directory: " + projectRootDirectory);
     // string array of the frameworks to copy over
     string[] thirdPartyFrameworksToCopy = { "AdColony.framework" };
 
@@ -614,7 +793,6 @@ public static class AdColonyPostProcessBuild
         SearchDirectoryForDirectory(projectRootDirectory, directoryBeingSought, true, directoryResults);
       }
 
-      // Debug.Log(targetDirectory);
       if(!Directory.Exists(targetDirectory)) {
         Debug.Log("CREATING A THIRD PARTY FRAMEWORKS FOLDER AT:\n" + targetDirectory);
         Directory.CreateDirectory(targetDirectory);
@@ -656,11 +834,6 @@ public static class AdColonyPostProcessBuild
     string directoryToCopyName = directoryToCopy.Substring(directoryToCopy.LastIndexOf(Path.DirectorySeparatorChar) + 1);
     string directoryToCopyToWithNewDirectory = Path.Combine(directoryToCopyTo, directoryToCopyName);
 
-    // Debug.Log("-----------------------------------------------------");
-    // Debug.Log("directory to copy name: " + directoryToCopyName);
-    // Debug.Log("directory to copy into: " + directoryToCopyToWithNewDirectory);
-    // Debug.Log("-----------------------------------------------------");
-
     if(!Directory.Exists(directoryToCopyToWithNewDirectory)) {
       Directory.CreateDirectory(directoryToCopyToWithNewDirectory);
     }
@@ -675,7 +848,6 @@ public static class AdColonyPostProcessBuild
 
       File.Copy(dirFile, fullPathToNewFile, true);
     }
-    // Debug.Log("-----------------------------------------------------");
 
     if(copyRecursively) {
       foreach(string subdir in currentDirectorySubdirectoryInfo) {
