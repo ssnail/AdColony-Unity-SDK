@@ -23,6 +23,7 @@ public class PlayVideoZoneButton : GUITextureButton {
 	public override void Start() {
     base.Start();
     ADCAdManager.AddOnAdAvailabilityChangeMethod(OnAvailabilityChange);
+    UpdateReadyTexture(ADCAdManager.IsVideoAvailableByZoneKey(zoneIdKey));
 	}
 
 	// Update is called once per frame
@@ -33,14 +34,18 @@ public class PlayVideoZoneButton : GUITextureButton {
     ADCAdManager.ShowVideoAdByZoneKey(zoneIdKey, true, false);
   }
 
+  public void UpdateReadyTexture(bool availability) {
+    if(availability) {
+      videoZoneStateTexture.texture = readyTexture;
+    }
+    else {
+      videoZoneStateTexture.texture = notReadyTexture;
+    }
+  }
+
   public void OnAvailabilityChange(bool availability, string zoneId) {
     if(ADCAdManager.GetZoneIdByKey(zoneIdKey) == zoneId) {
-      if(availability) {
-        videoZoneStateTexture.texture = readyTexture;
-      }
-      else {
-        videoZoneStateTexture.texture = notReadyTexture;
-      }
+      UpdateReadyTexture(availability);
     }
   }
 }
