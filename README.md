@@ -1,6 +1,6 @@
 #AdColony Unity Plugin
 Modified: May 29th, 2014  
-iOS SDK Version: 2.2.4  
+iOS SDK Version: 2.4.10
 Android SDK Version: 2.1.1
 
 ##Getting Started with AdColony:
