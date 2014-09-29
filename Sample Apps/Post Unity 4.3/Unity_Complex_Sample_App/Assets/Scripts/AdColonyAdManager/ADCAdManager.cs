@@ -74,11 +74,14 @@ public class ADCAdManager : MonoBehaviour {
 	}
 
   public void Pause() {
+    GameObject musicGameObject = GameObject.Find("MusicGameObject");
+    musicGameObject.GetComponent<AudioSource>().Pause();
   }
 
   public void Resume() {
+    GameObject musicGameObject = GameObject.Find("MusicGameObject");
+    musicGameObject.GetComponent<AudioSource>().Play();
   }
-
 
   public void ConfigureADCPlugin() {
     //THIS MUST BE RUN BEFORE ADCOLONY.CONFIGURE() IN ORDER FOR THE AD MANAGER TO BE AWARE OF WHAT INFORMATION TO PASS TO THE ADCOLONY PLUGIN
