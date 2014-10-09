@@ -74,9 +74,17 @@ public class ADCAdManager : MonoBehaviour {
 	}
 
   public void Pause() {
+    GameObject musicGameObject = GameObject.Find("MusicGameObject");
+    if(musicGameObject != null) {
+      musicGameObject.GetComponent<AudioSource>().Pause();
+    }
   }
 
   public void Resume() {
+    GameObject musicGameObject = GameObject.Find("MusicGameObject");
+    if(musicGameObject != null) {
+      musicGameObject.GetComponent<AudioSource>().Play();
+    }
   }
 
 
