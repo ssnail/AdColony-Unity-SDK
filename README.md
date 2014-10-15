@@ -88,7 +88,9 @@ Included is an app to use as an example and for help on AdColony integration. Ad
 
 
 ##Legal Requirements:
-You must accept the terms and conditions on the AdColony website by registering in order to legally use the AdColony SDK. U.S. based companies will need to complete the W-9 form and send it to us, as well as complete the section on payment information on clients.adcolony.com, before publisher payments can be issued.
+By downloading the AdColony SDK, you are granted a limited, non-commercial license to use and review the SDK solely for evaluation purposes.  If you wish to integrate the SDK into any commercial applications, you must register an account with [AdColony](https://clients.adcolony.com/signup) and accept the terms and conditions on the AdColony website.
+
+Note that U.S. based companies will need to complete the W-9 form and send it to us before publisher payments can be issued.
 
 ##Contact Us:
 For more information, please visit AdColony.com. For questions or assistance, please email us at support@adcolony.com.
