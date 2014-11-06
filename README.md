@@ -1,6 +1,7 @@
 #AdColony Unity Plugin
-Modified: September 19th, 2014  
-iOS SDK Version: 2.4.10  
+Modified: September 19th, 2014
+Unity Plug-in Version: 2.0.4
+iOS SDK Version: 2.4.13 
 Android SDK Version: 2.1.1
 
 ##Getting Started with AdColony:
@@ -58,6 +59,9 @@ If you're not familiar with the package import process with Unity [follow this l
     * `ADCAdManager.cs`
     * `ADCVideoZone.cs`
     * `ADCVideoZoneType.cs`   
+
+##Change Log (2014/11/06):
+* iOS SDK 2.4.13 integrated
 
 ##Change Log (2014/07/23):
 * A new build script has been created in order to facilitate automated integration when building for iOS, using the AdColony-Unity-SDK. This build script is called `AdColonyPostProcessBuild.cs'
