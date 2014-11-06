@@ -298,8 +298,9 @@ public static class AdColonyPostProcessBuild
 
   static SectionParser sectionParser = null;
 
-  /// Processbuild Function
-  [PostProcessBuild(200)] // <- this is where the magic happens, this attribute triggers unity to call this method when the build process has finished
+  // Processbuild Function
+  // For the sake of ease AdColony's Post Process Build script should ALWAYS be run last
+  [PostProcessBuild(2000)] // <- this is where the magic happens, this attribute triggers unity to call this method when the build process has finished
   public static void OnPostProcessBuild(BuildTarget target, string path)
   {
       // Checks this is an iOS build before running
