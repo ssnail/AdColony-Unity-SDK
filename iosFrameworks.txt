@@ -1,0 +1,24 @@
+Linked Frameworks and Libraries:
+Framework                     Status
+--------------------------------------
+AdColony.framework            required
+--------------------------------------
+AudioToolbox.framework        required
+CoreGraphics.framework        required
+CoreMedia.framework           required
+CoreTelephony.framework       required
+EventKit.framework            required
+EventKitUI.framework          required
+MediaPlayer.framework         required
+MessageUI.framework           required
+QuartzCore.framework          required
+SystemConfiguration.framework required
+libz.1.2.5.dylib              required
+--------------------------------------
+AVFoundation.framework        optional
+AdSupport.framework           optional
+Social.framework              optional
+StoreKit.framework            optional
+Webkit.framework              optional
+
+Under Target > Build Settings > Linking > Other Linker Flags: Add -ObjC -fobjc-arc
