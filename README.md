@@ -6,8 +6,8 @@ Android SDK Version: 2.2.1
 
 ##Getting Started with AdColony Unity:
 First time users should review the [quick start guide](https://github.com/AdColony/AdColony-Unity-SDK/wiki).  
-Note for _Unity 5:_ 
-On iOS, when building the Xcode project, you may get Semantic Issues and Arc Restrictions errors in the UnityADC.mm file. To resolve these issues, add the `-fno-objc-arc` flag to the build process for this file only. To add a flag to a single file navigate _Targets -> Build Phases -> Compile Sources._ Double click on the right column of the UnityADC.mm row.
+Note for **Unity 5:** 
+On iOS, when building the Xcode project, you may get Semantic Issues and Arc Restrictions errors in the UnityADC.mm file. To resolve these issues, add the `-fno-objc-arc` flag to the build process for this file only. To add a flag to a single file navigate **Targets -> Build Phases -> Compile Sources.** Double click on the right column of the UnityADC.mm row.
 
 
 ###AdColony Package Contains:
