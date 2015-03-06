@@ -2,4 +2,4 @@
 __MACOSX
 
 **/Library/*
-*.meta
+**/Temp/*
