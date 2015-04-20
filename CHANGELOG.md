@@ -1,3 +1,6 @@
+##Change Log (2015/04/20):
+* Added Support for IAP Promo Adds
+
 ##Change Log (2015/02/23):
 * Change Log split from README
 * Removed Support for Unity Pre4.3
