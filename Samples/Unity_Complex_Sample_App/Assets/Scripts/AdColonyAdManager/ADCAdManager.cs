@@ -61,6 +61,7 @@ public class ADCAdManager : MonoBehaviour {
     // This is done so that users can have custom methods to respond to these events.
     AddOnVideoStartedMethod(OnVideoStarted);
     AddOnVideoFinishedMethod(OnVideoFinished);
+    AddOnVideoFinishedWithInfoMethod(OnVideoFinishedWithInfo);
     AddOnV4VCResultMethod(OnV4VCResult);
     AddOnAdAvailabilityChangeMethod(OnAdAvailabilityChange);
 
@@ -126,33 +127,36 @@ public class ADCAdManager : MonoBehaviour {
   //---------------------------------------------------------------------------
   // Default Delegate Methods
   //---------------------------------------------------------------------------
-  private void OnVideoStarted()
-  {
+  private void OnVideoStarted() {
     Debug.Log("On Video Started");
     Pause();
   }
 
-  private void OnVideoFinished( bool adWasShown )
-  {
+  private void OnVideoFinished( bool adWasShown ) {
     Debug.Log("On Video Finished, and Ad was shown: " + adWasShown);
     Resume();
   }
 
-  private void OnV4VCResult(bool success, string name, int amount)
-  {
-    if(success)
-    {
+  private void OnVideoFinishedWithInfo( AdColonyAd ad ) {
+    Debug.Log("On Video Finished With Info, ad Played: " + ad.toString() );
+    if(ad.iapEnabled) {
+      Debug.Log("Calling Notify IAP Complete");
+      AdColony.notifyIAPComplete("ProductID", "TransactionID");
+      Debug.Log("Notified of IAP Complete");
+    }
+    Resume();
+  }
+
+  private void OnV4VCResult(bool success, string name, int amount) {
+    if(success) {
       Debug.Log("V4VC SUCCESS: name = " + name + ", amount = " + amount);
       AddToCurrency(amount);
-    }
-    else
-    {
+    } else {
       Debug.LogWarning("V4VC FAILED!");
     }
   }
 
-  private void OnAdAvailabilityChange( bool avail, string zoneId)
-  {
+  private void OnAdAvailabilityChange( bool avail, string zoneId) {
     Debug.Log("Ad Availability Changed to available=" + avail + " In zone: "+ zoneId);
   }
 
@@ -171,6 +175,13 @@ public class ADCAdManager : MonoBehaviour {
   }
   public static void RemoveOnVideoFinishedMethod(AdColony.VideoFinishedDelegate onVideoFinished) {
     AdColony.OnVideoFinished -= onVideoFinished;
+  }
+  //-----------------
+  public static void AddOnVideoFinishedWithInfoMethod(AdColony.VideoFinishedWithInfoDelegate onVideoFinishedWithInfo) {
+    AdColony.OnVideoFinishedWithInfo += onVideoFinishedWithInfo;
+  }
+  public static void RemoveOnVideoFinishedWithInfoMethod(AdColony.VideoFinishedWithInfoDelegate onVideoFinishedWithInfo) {
+    AdColony.OnVideoFinishedWithInfo -= onVideoFinishedWithInfo;
   }
   //-----------------
   public static void AddOnV4VCResultMethod(AdColony.V4VCResultDelegate onV4VCResult) {
@@ -301,18 +312,15 @@ public class ADCAdManager : MonoBehaviour {
       else if(videoZone.zoneType == ADCVideoZoneType.V4VC) {
         if(offerV4VCBeforePlay) {
           AdColony.OfferV4VC(showPopUpAfter, zoneId);
-        }
-        else {
+        } else {
           AdColony.ShowV4VC(showPopUpAfter, zoneId);
         }
-      }
-      else {
+      } else {
         //Check nothing, video zone type isn't correct
         Debug.Log("An incorrect video zone type was requested to play. Please resolve this issue.");
       }
       Debug.Log("The zone '" + zoneId + "' was requested to play.");
-    }
-    else {
+    } else {
       Debug.Log("The zone '" + zoneId + "' was requested to play, but it is NOT ready to play yet.");
     }
   }
