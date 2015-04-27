@@ -1,6 +1,6 @@
 #AdColony Unity Plugin
-Modified: April 20th, 2015  
-Unity Plug-in Version: 2.0.6  
+Modified: April 27th, 2015
+Unity Plug-in Version: 2.0.7  
 iOS SDK Version: 2.5.0  
 Android SDK Version: 2.2.1  
 
@@ -21,7 +21,7 @@ On iOS, when building the Xcode project, you may get Semantic Issues and Arc Res
     * `AdColony.framework`
     * `UnityADC.mm`
 * Scripts
-  * AdColony
+  * AdColonyAdManager
     * `ADCAdManager.cs`
     * `ADCVideoZone.cs`
     * `ADCVideoZoneType.cs`
@@ -31,7 +31,7 @@ The AdColony Unity SDK Package is [Available Here for download](https://github.c
 
 ##To Install
 The AdColony Unity SDK Package is a standard .unitypackage that can be imported into your project.
-To review importing unity packages please see [this document](http://docs.unity3d.com/Manual/HOWTO-exportpackage.html)
+To review importing unity packages please see [this document](http://docs.unity3d.com/Manual/HOWTO-exportpackage.html).  You will need the contents of the "Plugins" folder but the use of the helper scripts in Scripts/AdColonyAdManager is optional.
 
 ##Sample Applications:
 Included are apps to serve as examples for AdColony integration, configuration and playing interstitial and V4VC ads.

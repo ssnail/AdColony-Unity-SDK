@@ -1,3 +1,6 @@
+##Change Log (2015/04/27):
+* Fixed Android plug-in bug where no ads would play after the first ad under certain conditions.
+
 ##Change Log (2015/04/20):
 * Added Support for IAP Promo Adds
 
