@@ -1,3 +1,6 @@
+##Change Log (2015/05/12):
+* Fixed an iOS plug-in bug where shown ads would return "false" to the onVideoFinished delegate.
+
 ##Change Log (2015/04/27):
 * Fixed Android plug-in bug where no ads would play after the first ad under certain conditions.
 

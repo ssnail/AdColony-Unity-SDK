@@ -72,7 +72,7 @@ NSString* set_adc_cur_zone( NSString* new_adc_cur_zone )
 
 - (void) onAdColonyAdFinishedWithInfo:(AdColonyAdInfo *)info
 {
-  const char* message_info = [[NSString stringWithFormat:@"%hhd|%hhd|%d|%@", info.shown, info.iapEnabled, info.iapEngagementType, info.iapProductID ] UTF8String];
+    const char* message_info = [[NSString stringWithFormat:@"%@|%@|%d|%@", info.shown ? @"true" : @"false", info.iapEnabled ? @"true" : @"false", info.iapEngagementType, info.iapProductID ] UTF8String];
   NSLog(@"%s", message_info);
   UnitySendMessage( "AdColony", "OnAdColonyVideoFinished", message_info);
 }

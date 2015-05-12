@@ -1,12 +1,12 @@
 #AdColony Unity Plugin
-* Modified: April 27th, 2015
-* Unity Plug-in Version: 2.0.7
+* Modified: May 12th, 2015
+* Unity Plug-in Version: 2.0.8
 * iOS SDK Version: 2.5.0
 * Android SDK Version: 2.2.1
 
 ##Getting Started with AdColony Unity:
-First time users should review the [quick start guide](https://github.com/AdColony/AdColony-Unity-SDK/wiki).  
-Note for **Unity 5:** 
+First time users should review the [quick start guide](https://github.com/AdColony/AdColony-Unity-SDK/wiki).
+Note for **Unity 5:**
 Locate the 'Platform Settings' on the file Assets/Plugins/iOS/UnityADC in the Unity inspector, add the `-fno-objc-arc` flag to the 'Compile flags'. This will resolve issues when building the Xcode project.
 
 ###AdColony Package Contains:
