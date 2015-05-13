@@ -1,3 +1,6 @@
+##Change Log (2015/05/13):
+* Fixed an iOS plug-in bug in changing orientations during video playback
+
 ##Change Log (2015/05/12):
 * Fixed an iOS plug-in bug where shown ads would return "false" to the onVideoFinished delegate.
 

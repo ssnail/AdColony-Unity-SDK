@@ -38,6 +38,7 @@ NSString*     adc_app_id = nil;
 NSString*     adc_cur_zone = nil;
 NSMutableArray* adc_zone_ids = nil;
 UnityADCIOSDelegate* adc_ios_delegate = nil;
+UIViewController* appViewController = nil;
 
 NSString* set_adc_cur_zone( NSString* new_adc_cur_zone )
 {
@@ -75,6 +76,7 @@ NSString* set_adc_cur_zone( NSString* new_adc_cur_zone )
     const char* message_info = [[NSString stringWithFormat:@"%@|%@|%d|%@", info.shown ? @"true" : @"false", info.iapEnabled ? @"true" : @"false", info.iapEngagementType, info.iapProductID ] UTF8String];
   NSLog(@"%s", message_info);
   UnitySendMessage( "AdColony", "OnAdColonyVideoFinished", message_info);
+    [[UIApplication sharedApplication] keyWindow].rootViewController = appViewController;
 }
 @end
 
@@ -91,7 +93,7 @@ extern "C" {
     NSString* result_str = [AdColony getCustomID];
     if (result_str) {
       const char *c_str = [result_str UTF8String];
-      int count = strlen( c_str );
+      size_t count = strlen( c_str );
       char* result = (char *)malloc(count + 1);
       strcpy( result, c_str );
       return result;
@@ -143,7 +145,7 @@ extern "C" {
     NSString* result_str = [AdColony getUniqueDeviceID];
     if (result_str) {
       const char *c_str = [result_str UTF8String];
-      int count = strlen( c_str );
+      size_t count = strlen( c_str );
       char* result = (char *)malloc(count + 1);
       strcpy( result, c_str );
       return result;
@@ -158,7 +160,7 @@ extern "C" {
     NSString* result_str = [AdColony getOpenUDID];
     if (result_str) {
       const char *c_str = [result_str UTF8String];
-      int count = strlen( c_str );
+      size_t count = strlen( c_str );
       char* result = (char *)malloc(count + 1);
       strcpy( result, c_str );
       return result;
@@ -173,7 +175,7 @@ extern "C" {
     NSString* result_str = [AdColony getODIN1];
     if (result_str) {
       const char *c_str = [result_str UTF8String];
-      int count = strlen( c_str );
+      size_t count = strlen( c_str );
       char* result = (char *)malloc(count + 1);
       strcpy( result, c_str );
       return result;
@@ -200,7 +202,7 @@ extern "C" {
     NSString* result_str = [AdColony getVirtualCurrencyNameForZone:zid];
     if (result_str) {
       const char *c_str = [result_str UTF8String];
-      int count = strlen( c_str );
+      size_t count = strlen( c_str );
       char* result = (char *)malloc(count + 1);
       strcpy( result, c_str );
       return result;
@@ -250,6 +252,11 @@ extern "C" {
     if ( !IOSIsVideoAvailable(zone_id) ) {
       return false;
     }
+      UIWindow* window = [[UIApplication sharedApplication] keyWindow];
+      UIViewController* viewController = [UIViewController new];
+      [viewController.view setBackgroundColor:[UIColor whiteColor]];
+      appViewController = window.rootViewController;
+      window.rootViewController = viewController;
 
     [AdColony playVideoAdForZone:zid withDelegate:adc_ios_delegate];
     return true;
@@ -263,6 +270,11 @@ extern "C" {
     if ( !IOSIsV4VCAvailable(zone_id) ) {
       return false;
     }
+      UIWindow* window = [[UIApplication sharedApplication] keyWindow];
+      UIViewController* viewController = [UIViewController new];
+      [viewController.view setBackgroundColor:[UIColor whiteColor]];
+      appViewController = window.rootViewController;
+      window.rootViewController = viewController;
 
     [AdColony playVideoAdForZone:zid withDelegate:adc_ios_delegate
                 withV4VCPrePopup:NO andV4VCPostPopup:popup_result];
@@ -277,13 +289,17 @@ extern "C" {
     if ( !IOSIsV4VCAvailable(zone_id) ) {
       return;
     }
+      UIWindow* window = [[UIApplication sharedApplication] keyWindow];
+      UIViewController* viewController = [UIViewController new];
+      [viewController.view setBackgroundColor:[UIColor whiteColor]];
+      appViewController = window.rootViewController;
+      window.rootViewController = viewController;
 
     [AdColony playVideoAdForZone:zid withDelegate:adc_ios_delegate
                 withV4VCPrePopup:YES andV4VCPostPopup:popup_result];
   }
 
   void IOSNotifyIAPComplete( const char* product_id, const char* trans_id, const char* currency_code, double price, int quantity) {
-    //TODO: get quantity??
     NSString* ns_trans_id = [NSString stringWithUTF8String:trans_id];
     NSString* ns_product_id = [NSString stringWithUTF8String:product_id];
     NSString* ns_currency_code = @"";
