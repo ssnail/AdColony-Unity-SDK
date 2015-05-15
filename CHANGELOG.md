@@ -1,3 +1,6 @@
+##Change Log (2015/05/15):
+* Fixed an Android plug0in bug where callbacks where not being called after the video played
+
 ##Change Log (2015/05/13):
 * Fixed an iOS plug-in bug in changing orientations during video playback
 
