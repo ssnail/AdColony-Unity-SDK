@@ -18,10 +18,24 @@
 #import <AdColony/AdColony.h>
 
 void UnityPause(bool pause);
+@interface AdColonyRootViewControllerForUnity : UIViewController
 
+@end
+
+@implementation AdColonyRootViewControllerForUnity
+
+-(BOOL)shouldAutorotate
+{
+    return NO;
+}
+
+@end
 
 @interface UnityADCIOSDelegate : NSObject<AdColonyDelegate,AdColonyAdDelegate>
 {
+  UIWindow* keyWindow;
+  UIWindow* videoWindow;
+  UIViewController * keyWindowViewController;
 }
 // AdColonyDelegate
 - (void) onAdColonyV4VCReward:(BOOL)success currencyName:(NSString *)currencyName currencyAmount:(int)amount inZone:(NSString *)zoneID;
@@ -69,6 +83,21 @@ NSString* set_adc_cur_zone( NSString* new_adc_cur_zone )
 - (void) onAdColonyAdStartedInZone:(NSString *)zoneID
 {
   UnitySendMessage( "AdColony", "OnAdColonyVideoStarted", "" );
+  //Create a new UIWindow for AdColony.
+  if(videoWindow == nil){
+    videoWindow = [[UIWindow alloc] initWithFrame: [[UIScreen mainScreen] bounds]];
+    [videoWindow setBackgroundColor:[UIColor clearColor]];
+    videoWindow.rootViewController = [[AdColonyRootViewControllerForUnity alloc] init];
+    [videoWindow setWindowLevel:UIWindowLevelStatusBar];
+  }
+  
+  keyWindow = [[UIApplication sharedApplication] keyWindow];
+  if (keyWindow == nil) {
+    keyWindow = [[[UIApplication sharedApplication] windows] objectAtIndex:0];
+  }
+  [videoWindow makeKeyAndVisible];
+  keyWindowViewController = keyWindow.rootViewController;
+  [keyWindow setRootViewController:nil];
 }
 
 - (void) onAdColonyAdFinishedWithInfo:(AdColonyAdInfo *)info
@@ -76,7 +105,12 @@ NSString* set_adc_cur_zone( NSString* new_adc_cur_zone )
     const char* message_info = [[NSString stringWithFormat:@"%@|%@|%d|%@", info.shown ? @"true" : @"false", info.iapEnabled ? @"true" : @"false", info.iapEngagementType, info.iapProductID ] UTF8String];
   NSLog(@"%s", message_info);
   UnitySendMessage( "AdColony", "OnAdColonyVideoFinished", message_info);
-    [[UIApplication sharedApplication] keyWindow].rootViewController = appViewController;
+    
+  if(videoWindow != nil && !videoWindow.hidden){
+    keyWindow.rootViewController = keyWindowViewController;
+    [keyWindow makeKeyAndVisible];
+    [videoWindow setHidden:YES];
+  }
 }
 @end
 
@@ -252,11 +286,6 @@ extern "C" {
     if ( !IOSIsVideoAvailable(zone_id) ) {
       return false;
     }
-      UIWindow* window = [[UIApplication sharedApplication] keyWindow];
-      UIViewController* viewController = [UIViewController new];
-      [viewController.view setBackgroundColor:[UIColor whiteColor]];
-      appViewController = window.rootViewController;
-      window.rootViewController = viewController;
 
     [AdColony playVideoAdForZone:zid withDelegate:adc_ios_delegate];
     return true;
@@ -270,11 +299,6 @@ extern "C" {
     if ( !IOSIsV4VCAvailable(zone_id) ) {
       return false;
     }
-      UIWindow* window = [[UIApplication sharedApplication] keyWindow];
-      UIViewController* viewController = [UIViewController new];
-      [viewController.view setBackgroundColor:[UIColor whiteColor]];
-      appViewController = window.rootViewController;
-      window.rootViewController = viewController;
 
     [AdColony playVideoAdForZone:zid withDelegate:adc_ios_delegate
                 withV4VCPrePopup:NO andV4VCPostPopup:popup_result];
@@ -289,11 +313,6 @@ extern "C" {
     if ( !IOSIsV4VCAvailable(zone_id) ) {
       return;
     }
-      UIWindow* window = [[UIApplication sharedApplication] keyWindow];
-      UIViewController* viewController = [UIViewController new];
-      [viewController.view setBackgroundColor:[UIColor whiteColor]];
-      appViewController = window.rootViewController;
-      window.rootViewController = viewController;
 
     [AdColony playVideoAdForZone:zid withDelegate:adc_ios_delegate
                 withV4VCPrePopup:YES andV4VCPostPopup:popup_result];
